@@ -3,7 +3,7 @@ POWER CONNECTIONS
 
 ESP32 3.3V Pin  ->  Connect to VCC of DHT11, SHT31, and SM100
 
-ESP32 GND Pin   ->  Connect to GND of all sensors and all LED cathodes (short legs)
+ESP32 GND Pin   ->  Connect to GND of all sensors and all LED cathodes
 
 SENSOR DATA PINS
 

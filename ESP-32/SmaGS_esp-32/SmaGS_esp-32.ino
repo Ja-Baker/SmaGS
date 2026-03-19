@@ -1,3 +1,5 @@
+//By: Aidan Engbert
+//3/19/2026
 #include <WiFi.h>
 #include <WiFiMulti.h>
 #include <HTTPClient.h>
