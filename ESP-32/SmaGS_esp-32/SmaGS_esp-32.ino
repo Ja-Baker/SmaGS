@@ -1,4 +1,5 @@
 #include <WiFi.h>
+#include <WiFiMulti.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 #include "DHT.h"
@@ -9,22 +10,18 @@
 #define DHTPIN 4
 #define DHTTYPE DHT11
 #define SOIL_PIN 34
-#define RED_LED 12    // Error Light
-#define GREEN_LED 13  // WiFi Connected
-#define BLUE_LED 14   // Water Pump Simulation
-#define DRY_THRESHOLD 30.0 // Pump (Blue LED) turns on below 30% moisture
+#define RED_LED 12    
+#define GREEN_LED 13  
+#define BLUE_LED 14  
+#define DRY_THRESHOLD 30.0 
 
-const char* ssid = SECRET_SSID;
-const char* password = SECRET_PASS;
-const char* serverUrl = SECRET_SERVER_URL;
-
-unsigned long lastConnectionTime = 0;
-const unsigned long postingInterval = 60000; // 1 minute
-
-float last_soil_moisture, last_soil_temp, last_air_humidity, last_air_temp;
-
+WiFiMulti wifiMulti;
 DHT dht(DHTPIN, DHTTYPE);
 SHT31 sht(0x44);
+const char* serverUrl = SECRET_SERVER_URL;
+unsigned long lastConnectionTime = 0;
+const unsigned long postingInterval = 60000;
+float last_soil_moisture, last_soil_temp, last_air_humidity, last_air_temp;
 
 void setup() {
   Serial.begin(115200);
@@ -34,26 +31,22 @@ void setup() {
   dht.begin();
   Wire.begin(); 
   sht.begin();
+  wifiMulti.addAP(SSID_1, PASS_1);
+  wifiMulti.addAP(SSID_2, PASS_2);
   connectToWiFi();
 }
 
 void connectToWiFi() {
-  WiFi.begin(ssid, password);
-  Serial.print("Connecting to WiFi");
-  int attempts = 0;
-  while (WiFi.status() != WL_CONNECTED && attempts < 20) {
-    delay(500);
-    Serial.print(".");
-    attempts++;
-  }
-  
-  if (WiFi.status() == WL_CONNECTED) {
+  Serial.println("Scanning for known WiFi networks...");
+  if (wifiMulti.run() == WL_CONNECTED) {
     digitalWrite(GREEN_LED, HIGH);
     digitalWrite(RED_LED, LOW);
-    Serial.println("\nConnected!");
+    Serial.print("Connected to: ");
+    Serial.println(WiFi.SSID());
   } else {
     digitalWrite(GREEN_LED, LOW);
     digitalWrite(RED_LED, HIGH);
+    Serial.println("No known networks found.");
   }
 }
 
@@ -85,11 +78,7 @@ void loop() {
 }
 
 void sendData() {
-  if (WiFi.status() != WL_CONNECTED) {
-    digitalWrite(GREEN_LED, LOW);
-    connectToWiFi();
-  }
-  if (WiFi.status() == WL_CONNECTED) {
+  if (wifiMulti.run() == WL_CONNECTED) {
     digitalWrite(GREEN_LED, HIGH);
     HTTPClient http;
     http.begin(serverUrl);
@@ -103,9 +92,18 @@ void sendData() {
     String jsonString;
     serializeJson(doc, jsonString);
     int httpResponseCode = http.POST(jsonString);
-    if (httpResponseCode <= 0) {
+    if (httpResponseCode > 0) {
+      Serial.print("Data Sent. Server Response: ");
+      Serial.println(httpResponseCode);
+    } else {
+      Serial.print("Send Error: ");
+      Serial.println(httpResponseCode);
       digitalWrite(RED_LED, HIGH);
     }
     http.end();
+  } else {
+    digitalWrite(GREEN_LED, LOW);
+    digitalWrite(RED_LED, HIGH);
+    connectToWiFi();
   }
 }
