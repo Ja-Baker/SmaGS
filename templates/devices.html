@@ -1,0 +1,316 @@
+<!--
+Jack Baker
+3/17/2026
+
+devices.html - manage ESP32 devices: rename sensors, toggle visible metrics
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmaGS - Devices</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #1a2e1a;
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            background: linear-gradient(135deg, #2d5a27, #1e3d1a);
+            padding: 20px 30px;
+            border-bottom: 3px solid #4caf50;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .topbar h1 {
+            font-size: 26px;
+            color: #a5d6a7;
+            letter-spacing: 1px;
+        }
+
+        .topbar h1 span { color: #4caf50; }
+
+        .nav-links {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-link {
+            color: #81c784;
+            text-decoration: none;
+            font-size: 13px;
+            border: 1px solid #4caf5055;
+            padding: 6px 14px;
+            border-radius: 20px;
+        }
+
+        .nav-link:hover {
+            background: rgba(76, 175, 80, 0.2);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 25px 20px;
+        }
+
+        h2 {
+            color: #81c784;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 14px;
+            padding-left: 12px;
+            border-left: 3px solid #4caf50;
+        }
+
+        .section { margin-bottom: 30px; }
+
+        .device-card {
+            background: linear-gradient(145deg, #243824, #1e2e1e);
+            border: 1px solid #3a5a3a;
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 16px;
+            transition: border-color 0.2s;
+        }
+
+        .device-card:hover {
+            border-color: #4caf50;
+        }
+
+        .device-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #3a5a3a;
+        }
+
+        .device-mac {
+            font-family: monospace;
+            font-size: 13px;
+            color: #81c784;
+            background: rgba(76, 175, 80, 0.15);
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+
+        .device-seen {
+            font-size: 11px;
+            color: #5a7a5a;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            color: #6b8f6b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .form-group input[type="text"] {
+            width: 100%;
+            max-width: 300px;
+            background: #1a2e1a;
+            border: 1px solid #3a5a3a;
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: #e0e0e0;
+            font-size: 15px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input[type="text"]:focus {
+            border-color: #4caf50;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 10px;
+        }
+
+        .metric-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0,0,0,0.15);
+            padding: 10px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .metric-toggle:hover {
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .metric-toggle input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #3a5a3a;
+            border-radius: 4px;
+            background: #1a2e1a;
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .metric-toggle input[type="checkbox"]:checked {
+            background: #4caf50;
+            border-color: #4caf50;
+        }
+
+        .metric-toggle input[type="checkbox"]:checked::after {
+            content: "";
+            position: absolute;
+            left: 4px;
+            top: 1px;
+            width: 6px;
+            height: 10px;
+            border: solid #fff;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .metric-label {
+            font-size: 13px;
+            color: #e0e0e0;
+        }
+
+        .metric-label.moisture { color: #64b5f6; }
+        .metric-label.soiltemp { color: #ffb74d; }
+        .metric-label.humidity { color: #81d4fa; }
+        .metric-label.airtemp { color: #ff8a65; }
+
+        .save-btn {
+            background: linear-gradient(135deg, #4caf50, #388e3c);
+            color: #fff;
+            border: none;
+            padding: 10px 28px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            margin-top: 6px;
+        }
+
+        .save-btn:hover {
+            opacity: 0.85;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #5a7a5a;
+            font-style: italic;
+            background: #243824;
+            border-radius: 10px;
+        }
+
+        .info-box {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid #4caf5033;
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-bottom: 24px;
+            font-size: 13px;
+            color: #81c784;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div>
+            <h1>&#127793; Sma<span>GS</span> &mdash; Devices</h1>
+        </div>
+        <div class="nav-links">
+            <a href="/" class="nav-link">&#8592; Dashboard</a>
+            <a href="/sessions" class="nav-link">Sessions</a>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <div class="info-box">
+            New ESP32 devices are automatically detected when they first send data.
+            You can rename each sensor and choose which metrics to display on its card.
+        </div>
+
+        <div class="section">
+            <h2>Registered Devices ({{ devices | length }})</h2>
+
+            {% if devices %}
+                {% for dev in devices %}
+                <div class="device-card">
+                    <div class="device-header">
+                        <span class="device-mac">{{ dev.mac_address }}</span>
+                        <span class="device-seen">First seen: {{ dev.first_seen }}</span>
+                    </div>
+
+                    <form method="POST" action="/devices/{{ dev.id }}/update">
+                        <div class="form-group">
+                            <label>Display Name</label>
+                            <input type="text" name="name" value="{{ dev.name }}" placeholder="e.g. Tomato Bed, Herb Box">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Visible Metrics</label>
+                            <div class="metrics-grid">
+                                <label class="metric-toggle">
+                                    <input type="checkbox" name="visible_metrics" value="soil_moisture"
+                                           {% if "soil_moisture" in dev.visible_metrics %}checked{% endif %}>
+                                    <span class="metric-label moisture">Soil Moisture</span>
+                                </label>
+                                <label class="metric-toggle">
+                                    <input type="checkbox" name="visible_metrics" value="soil_temp"
+                                           {% if "soil_temp" in dev.visible_metrics %}checked{% endif %}>
+                                    <span class="metric-label soiltemp">Soil Temp</span>
+                                </label>
+                                <label class="metric-toggle">
+                                    <input type="checkbox" name="visible_metrics" value="air_humidity"
+                                           {% if "air_humidity" in dev.visible_metrics %}checked{% endif %}>
+                                    <span class="metric-label humidity">Air Humidity</span>
+                                </label>
+                                <label class="metric-toggle">
+                                    <input type="checkbox" name="visible_metrics" value="air_temp"
+                                           {% if "air_temp" in dev.visible_metrics %}checked{% endif %}>
+                                    <span class="metric-label airtemp">Air Temp</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="save-btn">Save Changes</button>
+                    </form>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-data">
+                    No devices registered yet. Devices will appear here automatically when ESP32s start sending data.
+                </div>
+            {% endif %}
+        </div>
+
+    </div>
+</body>
+</html>

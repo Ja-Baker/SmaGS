@@ -1,0 +1,184 @@
+<!--
+Jack Baker
+3/10/2026
+
+sessions.html - list of all past sessions
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmaGS - Sessions</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #1a2e1a;
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            background: linear-gradient(135deg, #2d5a27, #1e3d1a);
+            padding: 20px 30px;
+            border-bottom: 3px solid #4caf50;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .topbar h1 {
+            font-size: 26px;
+            color: #a5d6a7;
+            letter-spacing: 1px;
+        }
+
+        .topbar h1 span { color: #4caf50; }
+
+        .nav-link {
+            color: #81c784;
+            text-decoration: none;
+            font-size: 13px;
+            border: 1px solid #4caf5055;
+            padding: 6px 14px;
+            border-radius: 20px;
+        }
+
+        .nav-link:hover {
+            background: rgba(76, 175, 80, 0.2);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 25px 20px;
+        }
+
+        h2 {
+            color: #81c784;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 14px;
+            padding-left: 12px;
+            border-left: 3px solid #4caf50;
+        }
+
+        .session-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .session-card {
+            background: linear-gradient(145deg, #243824, #1e2e1e);
+            border: 1px solid #3a5a3a;
+            border-radius: 12px;
+            padding: 18px 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-decoration: none;
+            color: #e0e0e0;
+            transition: border-color 0.2s;
+        }
+
+        .session-card:hover {
+            border-color: #4caf50;
+        }
+
+        .session-card.active {
+            border-color: #4caf50;
+            border-width: 2px;
+        }
+
+        .session-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .session-date {
+            font-size: 16px;
+            font-weight: 600;
+            color: #a5d6a7;
+        }
+
+        .session-time {
+            font-size: 12px;
+            color: #5a7a5a;
+        }
+
+        .session-meta {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .reading-count {
+            font-size: 14px;
+            color: #81c784;
+        }
+
+        .active-badge {
+            background: #4caf50;
+            color: #1a2e1a;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #5a7a5a;
+            font-style: italic;
+            background: #243824;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div>
+            <h1>&#127793; Sma<span>GS</span> Sessions</h1>
+        </div>
+        <a href="/" class="nav-link">&#8592; Back to Dashboard</a>
+    </div>
+
+    <div class="container">
+        <h2>All Sessions</h2>
+
+        {% if sessions %}
+        <div class="session-list">
+            {% for s in sessions %}
+            <a href="/sessions/{{ s.id }}" class="session-card {{ 'active' if s.id == current_session_id }}">
+                <div class="session-info">
+                    <div class="session-date">Session #{{ s.id }} &mdash; {{ s.start_time[:10] }}</div>
+                    <div class="session-time">
+                        Started: {{ s.start_time }}
+                        {% if s.end_time %}
+                         &middot; Ended: {{ s.end_time }}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="session-meta">
+                    <div class="reading-count">{{ s.reading_count }} readings</div>
+                    {% if s.id == current_session_id %}
+                    <div class="active-badge">Live</div>
+                    {% endif %}
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="no-data">No sessions recorded yet.</div>
+        {% endif %}
+    </div>
+</body>
+</html>

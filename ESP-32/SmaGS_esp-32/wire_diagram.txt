@@ -1,0 +1,34 @@
+ESP32 SmaGS wire diagram
+POWER CONNECTIONS
+
+ESP32 3.3V Pin  ->  Connect to VCC of DHT11, SHT31, and SM100
+
+ESP32 GND Pin   ->  Connect to GND of all sensors and all LED cathodes (short legs)
+
+SENSOR DATA PINS
+
+GPIO 4          ->  DHT11 Data Pin
+
+GPIO 21 (SDA)   ->  SHT31 Yellow Wire
+
+GPIO 22 (SCL)   ->  SHT31 Green Wire
+
+GPIO 34 (Analog)->  SM100 Signal/Data Pin
+
+LED PINS (Use 220 ohm resistors on each)
+
+GPIO 12         ->  Red LED (Error)
+
+GPIO 13         ->  Green LED (WiFi)
+
+GPIO 14         ->  Blue LED (Pump)
+
+SHT31 WIRE COLOR KEY (FS304)
+
+Brown:  3.3V
+
+Black:  GND
+
+Yellow: SDA (GPIO 21)
+
+Green:  SCL (GPIO 22)
