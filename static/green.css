@@ -2,15 +2,15 @@
 
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
-            background: #171717;
+            background: #1a2e1a;
             color: #e0e0e0;
             min-height: 100vh;
         }
 
         .topbar {
-            background: linear-gradient(135deg, #454545, #1c1c1c);
+            background: linear-gradient(135deg, #2d5a27, #1e3d1a);
             padding: 20px 30px;
-            border-bottom: 3px solid #9a9a9a;
+            border-bottom: 3px solid #4caf50;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -18,7 +18,7 @@
 
         .topbar h1 {
             font-size: 26px;
-            color: #cdcdcd;
+            color: #a5d6a7;
             letter-spacing: 1px;
         }
 
@@ -27,7 +27,7 @@
         }
 
         .topbar .subtitle {
-            color: #ababab;
+            color: #81c784;
             font-size: 13px;
             margin-top: 2px;
         }
@@ -39,39 +39,39 @@
         }
 
         .refresh-badge {
-            background: rgba(189, 189, 189, 0.2);
-            border: 1px solid #8c8c8c55;
-            color: #d8d8d8;
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid #4caf5055;
+            color: #81c784;
             padding: 6px 14px;
             border-radius: 20px;
             font-size: 12px;
         }
 
         .nav-link {
-            color: #d8d8d8;
+            color: #81c784;
             text-decoration: none;
             font-size: 13px;
-            border: 1px solid #8c8c8c55;
+            border: 1px solid #4caf5055;
             padding: 6px 14px;
             border-radius: 20px;
         }
 
         .nav-button {
-            background: rgba(0,0,0,0);
-            color: #d8d8d8;
+            background: rgba(0,0,0,0.15);
+            color: #81c784;
             text-decoration: none;
             font-size: 13px;
-            border: 1px solid #8c8c8c55;
+            border: 1px solid #4caf5055;
             padding: 6px 14px;
             border-radius: 20px;
         }
 
         .nav-button:hover {
-            background: rgba(0, 0, 0, 0.2)
+            background: rgba(76, 175, 80, 0.2)
         }
 
         .nav-link:hover {
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(76, 175, 80, 0.2);
         }
 
         .container {
@@ -88,15 +88,15 @@
         }
 
         .card {
-            background: linear-gradient(145deg, #4c4c4c, #1f1f1f);
-            border: 1px solid #8c8c8c55;
+            background: linear-gradient(145deg, #243824, #1e2e1e);
+            border: 1px solid #3a5a3a;
             border-radius: 14px;
             padding: 22px;
             transition: border-color 0.2s, transform 0.2s;
         }
 
         .card:hover {
-            border-color: #b7b7b7;
+            border-color: #4caf50;
             transform: translateY(-2px);
         }
 
