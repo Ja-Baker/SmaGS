@@ -1,10 +1,11 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 from datetime import datetime
 import sqlite3
 import os
 import json
 
 app = Flask(__name__)
+app.secret_key = 'smags' #<---- can be anything. used for session cookie. for themes
 
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "smags.db")
 
@@ -12,6 +13,24 @@ ALL_METRICS = ["soil_moisture", "soil_temp", "air_humidity", "air_temp"]
 
 current_session_id = None
 
+def get_available_themes():
+    """
+    Scans the static/css directory and returns a list of filenames 
+    without the .css extension.
+    """
+    css_directory = os.path.join(app.static_folder, 'css')
+    
+    # Ensure the directory exists to avoid errors on first run
+    if not os.path.exists(css_directory):
+        os.makedirs(css_directory)
+        return ['green'] # Default fallback
+        
+    # List all files, keeping only those ending in .css
+    files = [f for f in os.listdir(css_directory) if f.endswith('.css')]
+    print(files)
+    # Sort them alphabetically for a cleaner dropdown menu
+    print(sorted([f[:-4] for f in files]))
+    return sorted([f[:-4] for f in files])
 
 def get_db():
     conn = sqlite3.connect(DB_PATH)
@@ -117,6 +136,10 @@ def resolve_sensor_name(sensor_id, device_map):
 
 @app.route("/")
 def index():
+
+    theme = session.get('theme', 'green')
+    themes = get_available_themes()
+
     conn = get_db()
 
     latest = conn.execute("""
@@ -142,7 +165,7 @@ def index():
     conn.close()
     return render_template("index.html", latest=latest, history=history,
                            session_id=current_session_id, device_map=device_map,
-                           all_metrics=ALL_METRICS)
+                           all_metrics=ALL_METRICS, theme=theme, themes=themes)
 
 
 @app.route("/sessions")
@@ -230,6 +253,17 @@ def update_device(device_id):
     conn.commit()
     conn.close()
     return redirect(url_for("devices_page"))
+
+#Theme part developed by Aiden & Ricky
+# --- Theme Routes ---------------------------------------------------\
+@app.route('/set_theme', methods=['POST'])
+def set_theme():
+    choice = request.form.get('theme')
+    print(choice)
+    if choice:
+        session['theme'] = choice
+    
+    return redirect(url_for('index'))
 
 
 # ─── API Routes ──────────────────────────────────────────────────────

@@ -11,7 +11,7 @@ index.html - dashboard page, shows sensor data in cards per device
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SmaGS Dashboard</title>
     <meta http-equiv="refresh" content="30">
-    <link rel="stylesheet" href="{{ url_for('static', filename='green.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/' + theme + '.css') }}">
 </head>
 <body>
     <div class="topbar">
@@ -23,7 +23,17 @@ index.html - dashboard page, shows sensor data in cards per device
             <a href="/devices" class="nav-link">&#9881; Devices</a>
             <a href="/sessions" class="nav-link">Past Sessions</a>
             <div class="refresh-badge">&#8635; refreshes every 30s</div>
-            <button class="nav-button">Switch Theme</a>
+            <div class="nav-button">
+                <form action="/set_theme" method="POST" style="margin-bottom: 30px;">
+                <label for="theme-select">Current Interface:</label>
+                <select name="theme" id="theme-select" onchange="this.form.submit()">
+                    {% for t in themes %}
+                        <option value="{{ t }}" {% if theme == t %}selected{% endif %}>
+                            {{ t.replace('_', ' ').capitalize() }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
         </div>
     </div>
 
@@ -118,5 +128,10 @@ index.html - dashboard page, shows sensor data in cards per device
         </div>
 
     </div>
+
+    <script>
+        document.getElementById('theme-select').focus();
+    </script>
+
 </body>
 </html>
