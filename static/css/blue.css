@@ -33,9 +33,9 @@ navlink & navbutton hover: rgba(76, 175, 80, 0.2)
         }
 
         .topbar {
-            background: linear-gradient(135deg, #1500ff, #00bbff);
+            background: linear-gradient(135deg, #6a00ff, #00c3ff);
             padding: 20px 30px;
-            border-bottom: 3px solid #00bfff;
+            border-bottom: 3px solid #015f66;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -43,16 +43,16 @@ navlink & navbutton hover: rgba(76, 175, 80, 0.2)
 
         .topbar h1 {
             font-size: 26px;
-            color: #000000;
+            color: #83f9ff;
             letter-spacing: 1px;
         }
 
         .topbar h1 span {
-            color: #0044ff;
+            color: #6ce3db;
         }
 
         .topbar .subtitle {
-            color: #8681c7;
+            color: #00625b;
             font-size: 13px;
             margin-top: 2px;
         }
@@ -64,9 +64,9 @@ navlink & navbutton hover: rgba(76, 175, 80, 0.2)
         }
 
         .refresh-badge {
-            background: rgba(76, 175, 80, 0.2);
-            border: 1px solid #4c9eaf55;
-            color: #4c61af55;
+            background: rgba(76, 170, 175, 0.2);
+            border: 1px solid #514caf55;
+            color: #4cafa755;
             padding: 6px 14px;
             border-radius: 20px;
             font-size: 12px;
@@ -78,30 +78,40 @@ navlink & navbutton hover: rgba(76, 175, 80, 0.2)
         }
 
         .nav-link {
-            color: #81a3c7;
+            color: #81bac7;
             text-decoration: none;
             font-size: 13px;
-            border: 1px solid #4c98af55;
+            border: 1px solid #4caf5055;
             padding: 6px 14px;
             border-radius: 20px;
         }
 
         .nav-button {
-            background: rgba(0,0,0,0.15);
-            color: #81a6c7;
+            background: rgba(0, 0, 0, 0.15);
+            color: #81bfc7;
             text-decoration: none;
             font-size: 13px;
-            border: 1px solid #4c7aaf55;
-            padding: 6px 14px;
+            border: 1px solid #4caf5055;
+            padding: 6px;
+            border-radius: 20px;
+        }
+
+        .nav-button select{
+            appearance: none;
+            background-color: #81bcc7;
+            color: #2339389a;
+            border: 1px solid #4cafaf55;
+            padding-left: 2px;
+            padding-right: 2px;
             border-radius: 20px;
         }
 
         .nav-button:hover {
-            background: rgba(76, 173, 175, 0.2);
+            background: rgba(76, 175, 80, 0.2);
         }
 
         .nav-link:hover {
-            background: rgba(76, 89, 175, 0.2);
+            background: rgba(76, 175, 80, 0.2);
         }
 
         .container {
@@ -111,8 +121,8 @@ navlink & navbutton hover: rgba(76, 175, 80, 0.2)
         }
 
         .session-header {
-            background: linear-gradient(145deg, #243538, #1e2e2d);
-            border: 1px solid #3a505a;
+            background: linear-gradient(145deg, #243824, #1e2e1e);
+            border: 1px solid #3a5a3a;
             border-radius: 12px;
             padding: 18px 22px;
             margin-bottom: 24px;

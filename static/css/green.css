@@ -92,7 +92,17 @@ navlink & navbutton hover: rgba(76, 175, 80, 0.2)
             text-decoration: none;
             font-size: 13px;
             border: 1px solid #4caf5055;
-            padding: 6px 14px;
+            padding: 6px;
+            border-radius: 20px;
+        }
+
+        .nav-button select{
+            appearance: none;
+            background-color: #81c784;
+            color: #233924;
+            border: 1px solid #4caf5055;
+            padding-left: 2px;
+            padding-right: 2px;
             border-radius: 20px;
         }
 
