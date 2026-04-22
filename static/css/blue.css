@@ -1,0 +1,536 @@
+/*
+Colors - Green
+
+-- Body --
+Body Background: 1a2e1a
+Body Text Color: e0e0e0
+
+-- Topbar --
+Topbar gradient: 2d5a27 to 1e3d1a
+Topbar bottom border: 4caf50
+
+-- Topbar logo / left side --
+Topbar Text "Sma" color (h1): a5d6a7
+Topbar Text "GS" color (h1 span): 4caf50
+Topbar subtitle: 81c784
+
+-- Topbar rightside --
+refresh every 30s background: rgba(76, 175, 80, 0.2)
+refresh every 30s border: 4caf5055
+refresh every 30s text color: 4caf5055
+navlink & navbutton text color: 81c784
+navlink & navbutton border: 4caf5055
+navlink & navbutton hover: rgba(76, 175, 80, 0.2)
+*/
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #1a2e1a;
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            background: linear-gradient(135deg, #6a00ff, #00c3ff);
+            padding: 20px 30px;
+            border-bottom: 3px solid #015f66;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .topbar h1 {
+            font-size: 26px;
+            color: #83f9ff;
+            letter-spacing: 1px;
+        }
+
+        .topbar h1 span {
+            color: #6ce3db;
+        }
+
+        .topbar .subtitle {
+            color: #00625b;
+            font-size: 13px;
+            margin-top: 2px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .refresh-badge {
+            background: rgba(76, 170, 175, 0.2);
+            border: 1px solid #514caf55;
+            color: #4cafa755;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-link {
+            color: #81bac7;
+            text-decoration: none;
+            font-size: 13px;
+            border: 1px solid #4caf5055;
+            padding: 6px 14px;
+            border-radius: 20px;
+        }
+
+        .nav-button {
+            background: rgba(0, 0, 0, 0.15);
+            color: #81bfc7;
+            text-decoration: none;
+            font-size: 13px;
+            border: 1px solid #4caf5055;
+            padding: 6px;
+            border-radius: 20px;
+        }
+
+        .nav-button select{
+            appearance: none;
+            background-color: #81bcc7;
+            color: #2339389a;
+            border: 1px solid #4cafaf55;
+            padding-left: 2px;
+            padding-right: 2px;
+            border-radius: 20px;
+        }
+
+        .nav-button:hover {
+            background: rgba(76, 175, 80, 0.2);
+        }
+
+        .nav-link:hover {
+            background: rgba(76, 175, 80, 0.2);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 25px 20px;
+        }
+
+        .session-header {
+            background: linear-gradient(145deg, #243824, #1e2e1e);
+            border: 1px solid #3a5a3a;
+            border-radius: 12px;
+            padding: 18px 22px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .session-header .date {
+            font-size: 14px;
+            color: #81c784;
+        }
+
+        .session-header .times {
+            font-size: 12px;
+            color: #5a7a5a;
+            margin-top: 4px;
+        }
+
+        .session-header .count {
+            font-size: 14px;
+            color: #a5d6a7;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: linear-gradient(145deg, #243824, #1e2e1e);
+            border: 1px solid #3a5a3a;
+            border-radius: 14px;
+            padding: 22px;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+
+        .card:hover {
+            border-color: #4caf50;
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #3a5a3a;
+        }
+
+        .card .sensor-name {
+            font-size: 15px;
+            color: #a5d6a7;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .card .sensor-mac {
+            font-size: 10px;
+            color: #5a7a5a;
+            font-family: monospace;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #4caf50;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .card .readings {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .card .readings.single-col {
+            grid-template-columns: 1fr;
+        }
+
+        .card .reading {
+            background: rgba(0,0,0,0.15);
+            border-radius: 10px;
+            padding: 12px 10px;
+            text-align: center;
+        }
+
+        .card .reading .value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #e8f5e9;
+        }
+
+        .card .reading .label {
+            font-size: 10px;
+            color: #6b8f6b;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-top: 4px;
+        }
+
+        .card .updated {
+            margin-top: 14px;
+            padding-top: 8px;
+            border-top: 1px solid #3a5a3a;
+            font-size: 11px;
+            color: #5a7a5a;
+            text-align: right;
+        }
+
+        .moisture { color: #64b5f6 !important; }
+        .soiltemp { color: #ffb74d !important; }
+        .humidity { color: #81d4fa !important; }
+        .airtemp { color: #ff8a65 !important; }
+
+        h2 {
+            color: #81c784;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 14px;
+            padding-left: 12px;
+            border-left: 3px solid #4caf50;
+        }
+
+        .section { margin-bottom: 30px; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #243824;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th {
+            background: #2d5a27;
+            color: #a5d6a7;
+            padding: 12px 16px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        td {
+            padding: 10px 16px;
+            text-align: center;
+            border-bottom: 1px solid #2a4a2a;
+            font-size: 14px;
+        }
+
+        tr:hover td {
+            background: #2a4a2a;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #5a7a5a;
+            font-style: italic;
+            background: #243824;
+            border-radius: 10px;
+        }
+
+        .leaf {
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        .device-card {
+            background: linear-gradient(145deg, #243824, #1e2e1e);
+            border: 1px solid #3a5a3a;
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 16px;
+            transition: border-color 0.2s;
+        }
+
+        .device-card:hover {
+            border-color: #4caf50;
+        }
+
+        .device-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #3a5a3a;
+        }
+
+        .device-mac {
+            font-family: monospace;
+            font-size: 13px;
+            color: #81c784;
+            background: rgba(76, 175, 80, 0.15);
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+
+        .device-seen {
+            font-size: 11px;
+            color: #5a7a5a;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            color: #6b8f6b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .form-group input[type="text"] {
+            width: 100%;
+            max-width: 300px;
+            background: #1a2e1a;
+            border: 1px solid #3a5a3a;
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: #e0e0e0;
+            font-size: 15px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input[type="text"]:focus {
+            border-color: #4caf50;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 10px;
+        }
+
+        .metric-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0,0,0,0.15);
+            padding: 10px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .metric-toggle:hover {
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .metric-toggle input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #3a5a3a;
+            border-radius: 4px;
+            background: #1a2e1a;
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .metric-toggle input[type="checkbox"]:checked {
+            background: #4caf50;
+            border-color: #4caf50;
+        }
+
+        .metric-toggle input[type="checkbox"]:checked::after {
+            content: "";
+            position: absolute;
+            left: 4px;
+            top: 1px;
+            width: 6px;
+            height: 10px;
+            border: solid #fff;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .metric-label {
+            font-size: 13px;
+            color: #e0e0e0;
+        }
+
+        .metric-label.moisture { color: #64b5f6; }
+        .metric-label.soiltemp { color: #ffb74d; }
+        .metric-label.humidity { color: #81d4fa; }
+        .metric-label.airtemp { color: #ff8a65; }
+
+        .save-btn {
+            background: linear-gradient(135deg, #4caf50, #388e3c);
+            color: #fff;
+            border: none;
+            padding: 10px 28px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            margin-top: 6px;
+        }
+
+        .save-btn:hover {
+            opacity: 0.85;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #5a7a5a;
+            font-style: italic;
+            background: #243824;
+            border-radius: 10px;
+        }
+
+        .info-box {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid #4caf5033;
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-bottom: 24px;
+            font-size: 13px;
+            color: #81c784;
+            line-height: 1.5;
+        }
+
+        .session-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .session-card {
+            background: linear-gradient(145deg, #243824, #1e2e1e);
+            border: 1px solid #3a5a3a;
+            border-radius: 12px;
+            padding: 18px 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-decoration: none;
+            color: #e0e0e0;
+            transition: border-color 0.2s;
+        }
+
+        .session-card:hover {
+            border-color: #4caf50;
+        }
+
+        .session-card.active {
+            border-color: #4caf50;
+            border-width: 2px;
+        }
+
+        .session-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .session-date {
+            font-size: 16px;
+            font-weight: 600;
+            color: #a5d6a7;
+        }
+
+        .session-time {
+            font-size: 12px;
+            color: #5a7a5a;
+        }
+
+        .session-meta {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .reading-count {
+            font-size: 14px;
+            color: #81c784;
+        }
+
+        .active-badge {
+            background: #4caf50;
+            color: #1a2e1a;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
