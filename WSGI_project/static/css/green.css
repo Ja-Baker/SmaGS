@@ -32,6 +32,46 @@ body {
     line-height: 1.6;
 }
 
+/* --- Cookie Consent Banner --- */
+
+.cookie-banner {
+    background: #000;
+    border-bottom: 2px solid var(--accent-primary);
+    padding: 12px 5%;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    font-size: 0.9rem;
+}
+
+.cookie-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.accept-btn {
+    background: var(--accent-primary);
+    color: white;
+    padding: 6px 18px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.accept-btn:hover {
+    background: var(--accent-muted);
+}
+
+.decline-text {
+    color: #777;
+    font-size: 0.8rem;
+    margin-left: 10px;
+}
+
 /* --- Layout Components --- */
 
 .topbar {
@@ -58,6 +98,7 @@ body {
     color: var(--accent-muted);
     text-transform: uppercase;
     letter-spacing: 1px;
+    display: inline-block;
 }
 
 .container {
@@ -101,6 +142,8 @@ select {
     border: 1px solid var(--accent-primary);
     padding: 4px;
     border-radius: 4px;
+    cursor: pointer;
+    outline: none;
 }
 
 /* --- Dashboard Device Cards --- */
@@ -157,7 +200,13 @@ select {
 .metric.humidity .value { color: var(--humidity); }
 .metric.airtemp .value { color: var(--accent-primary); }
 
-/* --- Table Styles (History/Log) --- */
+/* --- Table Styles --- */
+
+.table-container {
+    overflow-x: auto;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.1);
+}
 
 table {
     width: 100%;
@@ -169,6 +218,8 @@ th {
     padding: 12px;
     background: rgba(0,0,0,0.3);
     color: var(--accent-muted);
+    font-size: 0.85rem;
+    text-transform: uppercase;
 }
 
 td {
@@ -176,87 +227,7 @@ td {
     border-bottom: 1px solid #222;
 }
 
-.moisture { color: var(--moisture); }
-.soiltemp { color: var(--temp); }
-.humidity { color: var(--humidity); }
-.airtemp { color: var(--accent-primary); }
-
-/* --- Sessions Page Components --- */
-
-.session-list {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.session-card {
-    text-decoration: none;
-    color: inherit;
-}
-
-.session-item-content {
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    padding: 20px;
-    border-radius: 12px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: 0.2s;
-}
-
-.session-card:hover .session-item-content {
-    border-color: var(--accent-primary);
-    background: var(--hover-bg);
-}
-
-.session-title {
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: var(--accent-secondary);
-}
-
-.active-badge {
-    background: var(--accent-primary);
-    color: white;
-    font-size: 10px;
-    padding: 2px 8px;
-    border-radius: 10px;
-    text-transform: uppercase;
-}
-
-.reading-count {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: var(--accent-primary);
-}
-
-.meta-label {
-    font-size: 0.7rem;
-    color: #555;
-    text-transform: uppercase;
-}
-
-/* --- Device Settings Page --- */
-
-.info-box {
-    background: rgba(76, 175, 80, 0.1);
-    border: 1px solid rgba(76, 175, 80, 0.3);
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-}
-
-.save-btn {
-    background: var(--accent-primary);
-    color: white;
-    border: none;
-    padding: 10px 25px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.save-btn:hover {
-    background: var(--accent-muted);
+.timestamp-cell {
+    color: #666;
+    font-family: monospace;
 }

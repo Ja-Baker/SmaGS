@@ -28,32 +28,50 @@
 }
 
 body {
-    font-family: 'VT323', monospace; /* Blocky font */
+    font-family: 'VT323', monospace;
     background-color: var(--bg-color);
-    background-image: url('https://www.transparenttextures.com/patterns/dark-matter.png'); /* Subtle dirt/stone texture */
+    background-image: url('https://www.transparenttextures.com/patterns/dark-matter.png');
     color: var(--text-color);
     font-size: 1.4rem;
+    image-rendering: pixelated;
 }
 
-/* --- The Splash Text Animation --- */
-@keyframes splash-pulse {
-    0% { transform: scale(1) rotate(-15deg); }
-    50% { transform: scale(1.1) rotate(-15deg); }
-    100% { transform: scale(1) rotate(-15deg); }
+/* --- Cookie Consent Banner (Chest Style) --- */
+
+.cookie-banner {
+    background: #262626;
+    border-bottom: 4px solid #000;
+    padding: 15px 5%;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
-.subtitle {
-    display: inline-block;
-    color: var(--accent-secondary);
-    font-size: 1.2rem;
-    text-shadow: 2px 2px #3f3f00;
-    animation: splash-pulse 0.5s infinite;
-    position: absolute;
-    margin-left: 10px;
-    margin-top: -10px;
+.cookie-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-/* --- Layout --- */
+.accept-btn {
+    background: #707070;
+    color: #fff;
+    padding: 5px 15px;
+    border: 3px solid #000;
+    border-top-color: #aeaeae;
+    border-left-color: #aeaeae;
+    text-decoration: none;
+}
+
+.accept-btn:hover {
+    background: var(--accent-primary);
+    border-top-color: #707070;
+    border-left-color: #707070;
+}
+
+/* --- Layout Components --- */
 
 .topbar {
     background-color: var(--header-bg);
@@ -62,7 +80,6 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    image-rendering: pixelated;
 }
 
 .topbar h1 {
@@ -75,15 +92,32 @@ body {
     color: var(--accent-primary);
 }
 
+/* Splash Text Logic */
+@keyframes splash-pulse {
+    0% { transform: scale(1) rotate(-15deg); }
+    50% { transform: scale(1.1) rotate(-15deg); }
+    100% { transform: scale(1) rotate(-15deg); }
+}
+
+.subtitle {
+    display: inline-block;
+    color: var(--accent-secondary);
+    font-size: 1.2rem;
+    text-shadow: 2px 2px #3f3f00;
+    animation: splash-pulse 0.5s infinite;
+    margin-left: 15px;
+    vertical-align: middle;
+}
+
 .container {
     width: 90%;
     max-width: 1200px;
     margin: 2rem auto;
 }
 
-/* --- Navigation Buttons (Minecraft Style) --- */
+/* --- Navigation & Forms --- */
 
-.nav-link, .save-btn {
+.nav-link {
     background: #707070;
     color: #fff;
     text-decoration: none;
@@ -91,25 +125,37 @@ body {
     border: 3px solid #000;
     border-top-color: #aeaeae;
     border-left-color: #aeaeae;
-    display: inline-block;
-    transition: background 0.1s;
+    margin: 0 5px;
 }
 
-.nav-link:hover, .save-btn:hover {
-    background: var(--accent-primary);
-    border-top-color: #707070;
-    border-left-color: #707070;
+.nav-link:hover {
+    background: #8b8b8b;
 }
 
-/* --- Cards (Chest/Inventory Style) --- */
+select {
+    background: #000;
+    color: var(--accent-secondary);
+    border: 2px solid #fff;
+    font-family: 'VT323', monospace;
+    font-size: 1.2rem;
+    padding: 2px 5px;
+}
 
-.device-card, .session-item-content {
+/* --- Dashboard Cards --- */
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.device-card {
     background: var(--card-bg);
     border: 4px solid #000;
     border-top-color: #8b8b8b;
     border-left-color: #8b8b8b;
     padding: 20px;
-    box-shadow: 4px 4px 0px rgba(0,0,0,0.5);
+    box-shadow: 6px 6px 0px rgba(0,0,0,0.4);
 }
 
 .device-header {
@@ -118,34 +164,55 @@ body {
     padding-bottom: 5px;
 }
 
+.device-name { color: var(--accent-secondary); font-weight: bold; }
+.device-time { font-size: 1rem; color: var(--accent-muted); }
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
 .metric {
     background: #373737;
     border: 2px solid #000;
+    padding: 10px;
 }
 
+.metric .label { font-size: 0.9rem; color: var(--accent-muted); display: block; }
+.metric .value { font-size: 1.3rem; }
+
+.metric.moisture .value { color: var(--moisture); }
+.metric.soiltemp .value { color: var(--temp); }
+.metric.humidity .value { color: var(--humidity); }
 .metric.airtemp .value { color: var(--accent-primary); }
 
-/* --- Sessions & Badges --- */
+/* --- Table Styles --- */
 
-.active-badge {
-    background: #ff5555; /* Redstone Active */
-    color: white;
-    border: 2px solid #000;
-    padding: 0 8px;
+.table-container {
+    overflow-x: auto;
+    border: 4px solid #000;
+    background: #1d1d1d;
 }
 
-.reading-count {
-    color: var(--accent-secondary);
+table {
+    width: 100%;
+    border-collapse: collapse;
 }
-
-/* --- Table --- */
 
 th {
-    background: #1d1d1d;
-    border: 2px solid #000;
+    background: #000;
     color: var(--accent-muted);
+    padding: 12px;
+    text-align: left;
+    border-bottom: 2px solid #444;
 }
 
 td {
-    border: 1px solid #444;
+    padding: 12px;
+    border-bottom: 1px solid #333;
+}
+
+.timestamp-cell {
+    color: #777;
 }

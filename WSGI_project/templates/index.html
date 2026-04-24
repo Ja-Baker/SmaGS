@@ -5,26 +5,106 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SmaGS Dashboard</title>
     <meta http-equiv="refresh" content="30">
+    
     <link rel="stylesheet" href="/static/css/{{ theme }}.css">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    
+    <style>
+        :root {
+            --accent-primary: #2ecc71; /* Fallback for the JS glow effect */
+        }
+
+        /* Styles for the Self-Healing Error Popup */
+        .error-popup {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background: #d9534f;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 9999;
+            animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            border-left: 5px solid #a94442;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(120%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .error-popup.fade-out {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s ease-out;
+        }
+
+        .popup-icon { font-size: 24px; }
+        .popup-text strong { display: block; font-size: 1.1em; margin-bottom: 2px; }
+
+        /* Loading state for the theme picker */
+        .theme-picker select:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+
+        /* Basic styling for the POST-based cookie button */
+        .accept-btn {
+            background: #2ecc71;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
+
+    {% if not consented %}
+    <div class="cookie-banner">
+        <div class="cookie-content">
+            <div class="cookie-text">
+                <span class="icon">&#127850;</span> 
+                This site uses a local cookie to remember your <strong>UI Museum</strong> theme.
+            </div>
+            <div class="cookie-actions">
+                <form action="/accept_cookies" method="POST" style="display:inline;">
+                    <button type="submit" class="accept-btn">Allow Cookies</button>
+                </form>
+                <span class="decline-text" style="margin-left: 10px;">Using: Default (Green)</span>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
     <div class="topbar">
-        <div>
+        <div class="logo-area">
             <h1><span class="leaf">&#127793;</span> Sma<span>GS</span></h1>
             <div class="subtitle">Smart Greenhouse System</div>
         </div>
+        
         <div class="topbar-right">
-            <a href="/devices" class="nav-link">&#9881; Devices</a>
-            <a href="/sessions" class="nav-link">Past Sessions</a>
-            <div class="refresh-badge">&#8635; refreshes every 30s</div>
+            <nav class="nav-menu">
+                <a href="/devices" class="nav-link">&#9881; Devices</a>
+                <a href="/sessions" class="nav-link">Past Sessions</a>
+            </nav>
             
-            <div class="nav-button">
-                <form action="/set_theme" method="POST">
+            <div class="theme-picker">
+                <form action="/set_theme" method="POST" id="theme-form">
                     <label for="theme-select">Interface:</label>
-                    <select name="theme" id="theme-select" onchange="this.form.submit()">
-                        <option value="green" {% if theme == 'green' %}selected{% endif %}>Greenhouse</option>
-                        <option value="midnight" {% if theme == 'midnight' %}selected{% endif %}>Midnight</option>
-                        <option value="classic" {% if theme == 'classic' %}selected{% endif %}>Classic IT</option>
+                    <select name="theme" id="theme-select" onchange="changeTheme(this)">
+                        {% for t in themes %}
+                            <option value="{{ t }}" {% if theme == t %}selected{% endif %}>
+                                {{ t.replace('_', ' ').title() }}
+                            </option>
+                        {% endfor %}
                     </select>
                 </form>
             </div>
@@ -32,91 +112,144 @@
     </div>
 
     <div class="container">
-        
         <div class="section">
             <h2>Live Sensor Status</h2>
             <div class="card-grid">
                 {% if latest %}
+                    {% set seen = namespace(sensors=[]) %}
                     {% for row in latest %}
-                    {% set device = device_map.get(row.sensor_id, {"name": row.sensor_id, "visible_metrics": all_metrics}) %}
-                    <div class="device-card">
-                        <div class="device-header">
-                            <span class="device-name">{{ device.name }}</span>
-                            <span class="device-time">{{ row.timestamp.split(' ')[1] }}</span>
-                        </div>
-                        
-                        <div class="metrics-grid">
-                            {% if "soil_moisture" in device.visible_metrics %}
-                            <div class="metric moisture">
-                                <span class="label">Soil Moisture</span>
-                                <span class="value">{{ row.soil_moisture }}%</span>
+                        {% if row.sensor_id not in seen.sensors %}
+                            {% set device = device_map.get(row.sensor_id, {"name": row.sensor_id, "visible_metrics": all_metrics}) %}
+                            <div class="device-card">
+                                <div class="device-header">
+                                    <span class="device-name">{{ device.name }}</span>
+                                    <span class="device-time">{{ row.timestamp.split(' ')[1] }}</span>
+                                </div>
+                                <div class="metrics-grid">
+                                    {% if "soil_moisture" in device.visible_metrics %}
+                                    <div class="metric moisture">
+                                        <span class="label">Soil Moisture</span>
+                                        <span class="value">{{ row.soil_moisture }}%</span>
+                                    </div>
+                                    {% endif %}
+                                    {% if "soil_temp" in device.visible_metrics %}
+                                    <div class="metric soiltemp">
+                                        <span class="label">Soil Temp</span>
+                                        <span class="value">{{ row.soil_temp }}°C</span>
+                                    </div>
+                                    {% endif %}
+                                    {% if "air_humidity" in device.visible_metrics %}
+                                    <div class="metric humidity">
+                                        <span class="label">Air Humidity</span>
+                                        <span class="value">{{ row.air_humidity }}%</span>
+                                    </div>
+                                    {% endif %}
+                                    {% if "air_temp" in device.visible_metrics %}
+                                    <div class="metric airtemp">
+                                        <span class="label">Air Temp</span>
+                                        <span class="value">{{ row.air_temp }}°C</span>
+                                    </div>
+                                    {% endif %}
+                                </div>
                             </div>
-                            {% endif %}
-
-                            {% if "soil_temp" in device.visible_metrics %}
-                            <div class="metric soiltemp">
-                                <span class="label">Soil Temp</span>
-                                <span class="value">{{ row.soil_temp }}°C</span>
-                            </div>
-                            {% endif %}
-
-                            {% if "air_humidity" in device.visible_metrics %}
-                            <div class="metric humidity">
-                                <span class="label">Air Humidity</span>
-                                <span class="value">{{ row.air_humidity }}%</span>
-                            </div>
-                            {% endif %}
-
-                            {% if "air_temp" in device.visible_metrics %}
-                            <div class="metric airtemp">
-                                <span class="label">Air Temp</span>
-                                <span class="value">{{ row.air_temp }}°C</span>
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
+                            {% set seen.sensors = seen.sensors + [row.sensor_id] %}
+                        {% endif %}
                     {% endfor %}
                 {% else %}
-                    <div class="no-data">Waiting for sensor data...</div>
+                    <div class="no-data-placeholder">
+                        <p>Waiting for sensor data from ESP32 nodes...</p>
+                    </div>
                 {% endif %}
             </div>
         </div>
 
         <div class="section">
-            <h2>Recent Log</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Sensor</th>
-                        <th>Soil Moist.</th>
-                        <th>Soil Temp</th>
-                        <th>Air Humid.</th>
-                        <th>Air Temp</th>
-                        <th>Time</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for row in latest %}
-                    {% set device = device_map.get(row.sensor_id, {"name": row.sensor_id}) %}
-                    <tr>
-                        <td>{{ device.name }}</td>
-                        <td class="moisture">{{ row.soil_moisture }}%</td>
-                        <td class="soiltemp">{{ row.soil_temp }}°C</td>
-                        <td class="humidity">{{ row.air_humidity }}%</td>
-                        <td class="airtemp">{{ row.air_temp }}°C</td>
-                        <td class="timestamp-cell">{{ row.timestamp }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <h2>Recent Data Log</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Location</th>
+                            <th>Soil Moist.</th>
+                            <th>Soil Temp</th>
+                            <th>Air Humid.</th>
+                            <th>Air Temp</th>
+                            <th>Recorded At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in latest %}
+                        {% set device = device_map.get(row.sensor_id, {"name": row.sensor_id}) %}
+                        <tr>
+                            <td><strong>{{ device.name }}</strong></td>
+                            <td>{{ row.soil_moisture }}%</td>
+                            <td>{{ row.soil_temp }}°C</td>
+                            <td>{{ row.air_humidity }}%</td>
+                            <td>{{ row.air_temp }}°C</td>
+                            <td class="timestamp-cell">{{ row.timestamp }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
-
     </div>
 
     <script>
-        // Keep focus on theme select after change for better UX
-        document.getElementById('theme-select').focus();
-    </script>
+        /**
+         * RESILIENT THEME SWITCHER
+         */
+        function changeTheme(selectElement) {
+            window.stop(); // Prevent page refresh interference
+            selectElement.disabled = true;
+            
+            console.log("SmaGS: Switching theme, activating 5s watchdog...");
 
+            const themeWatchdog = setTimeout(() => {
+                console.warn("SmaGS: Deadlock detected. Forcing recovery...");
+                window.location.href = "/?recovered=true"; 
+            }, 5000); 
+
+            selectElement.form.submit();
+        }
+
+        /**
+         * INITIALIZATION & RECOVERY
+         */
+        window.onload = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            if (urlParams.has('recovered')) {
+                showErrorPopup("Connection Reset", "The dashboard recovered from a temporary server hang.");
+            }
+
+            if (urlParams.has('theme_updated')) {
+                const select = document.getElementById('theme-select');
+                if (select) {
+                    select.style.boxShadow = "0 0 15px var(--accent-primary)";
+                    setTimeout(() => { select.style.boxShadow = "none"; }, 1500);
+                }
+            }
+        };
+
+        function showErrorPopup(title, message) {
+            const popup = document.createElement('div');
+            popup.className = 'error-popup';
+            popup.innerHTML = `
+                <div class="popup-icon">⚠️</div>
+                <div class="popup-text">
+                    <strong>${title}</strong>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(popup);
+
+            setTimeout(() => {
+                popup.classList.add('fade-out');
+                setTimeout(() => popup.remove(), 1000);
+            }, 5000);
+        }
+    </script>
 </body>
 </html>

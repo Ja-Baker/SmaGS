@@ -1,0 +1,199 @@
+/* SmaGS - Mainframe Theme (Amber CRT)
+   A retro-tech aesthetic with scanlines and glow effects.
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap');
+
+:root {
+    --bg-color: #0d0a00;
+    --text-color: #ffb000; /* Classic Amber */
+    --accent-primary: #ffb000;
+    --accent-secondary: #ffcc00;
+    --accent-muted: #845d00;
+    --card-bg: rgba(20, 15, 0, 0.8);
+    --border-color: #ffb000;
+    --header-gradient: linear-gradient(180deg, #1a1400, #0d0a00);
+    --hover-bg: rgba(255, 176, 0, 0.15);
+    
+    /* Monochrome Metric Colors */
+    --moisture: #ffb000;
+    --temp: #ffb000;
+    --humidity: #ffb000;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* CRT Scanline Overlay Effect - Adjusted z-index to allow clicks */
+body::before {
+    content: " ";
+    display: block;
+    position: fixed;
+    top: 0; left: 0; bottom: 0; right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    z-index: 5; /* Lowered so UI elements stay on top */
+    background_size: 100% 4px, 3px 100%;
+    pointer-events: none;
+}
+
+body {
+    font-family: 'Fira Code', monospace;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    animation: flicker 0.15s infinite;
+}
+
+/* --- Cookie Consent Banner --- */
+.cookie-banner {
+    background: #000;
+    border: 2px solid var(--accent-primary);
+    margin: 10px;
+    padding: 15px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.cookie-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.accept-btn {
+    border: 2px solid var(--accent-primary);
+    color: var(--accent-primary);
+    text-decoration: none;
+    padding: 8px 20px;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.accept-btn:hover {
+    background: var(--accent-primary);
+    color: #000;
+}
+
+.decline-text {
+    color: var(--accent-muted);
+    font-size: 0.8rem;
+    margin-left: 10px;
+}
+
+/* --- Layout --- */
+.topbar {
+    border-bottom: 2px solid var(--accent-primary);
+    padding: 1.5rem 5%;
+    background: var(--header-gradient);
+    position: relative;
+    z-index: 100; /* Above scanlines */
+}
+
+.topbar h1 {
+    font-size: 2.2rem;
+    text-shadow: 0 0 10px var(--accent-primary);
+}
+
+.topbar h1 span { color: #fff; }
+
+.subtitle {
+    font-size: 0.9rem;
+    color: var(--accent-muted);
+}
+
+.container {
+    width: 95%;
+    max-width: 1200px;
+    margin: 2rem auto;
+    position: relative;
+    z-index: 100;
+}
+
+/* --- Device Cards --- */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.device-card {
+    background: var(--card-bg);
+    border: 1px solid var(--accent-primary);
+    box-shadow: inset 0 0 15px rgba(255, 176, 0, 0.1);
+    padding: 20px;
+}
+
+.device-header {
+    border-bottom: 1px solid var(--accent-primary);
+    margin-bottom: 15px;
+    padding-bottom: 5px;
+}
+
+.metric {
+    border-left: 3px solid var(--accent-primary);
+    background: rgba(255, 176, 0, 0.03);
+    margin: 8px 0;
+    padding: 5px 10px;
+}
+
+.metric .value {
+    font-weight: bold;
+    text-shadow: 0 0 8px var(--accent-primary);
+}
+
+/* --- Navigation & Interaction --- */
+.nav-link, select {
+    background: transparent;
+    border: 1px solid var(--accent-primary);
+    color: var(--accent-primary);
+    padding: 8px 15px;
+    font-family: 'Fira Code', monospace;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.nav-link:hover {
+    background: var(--accent-primary);
+    color: #000;
+}
+
+/* --- Table --- */
+.table-container {
+    overflow-x: auto;
+    border: 1px solid var(--accent-muted);
+    background: rgba(0,0,0,0.5);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    border-bottom: 2px solid var(--accent-primary);
+    background: rgba(255, 176, 0, 0.1);
+    padding: 12px;
+    text-align: left;
+}
+
+td {
+    padding: 12px;
+    border-bottom: 1px solid var(--accent-muted);
+}
+
+/* Retro flicker animation */
+@keyframes flicker {
+    0% { opacity: 0.99; }
+    5% { opacity: 0.98; }
+    10% { opacity: 0.99; }
+    15% { opacity: 0.97; }
+    100% { opacity: 1; }
+}
