@@ -6,3 +6,5 @@ secrets.h
 *.h
 **/*.h
 secrets.h
+.env
+*.pyc
