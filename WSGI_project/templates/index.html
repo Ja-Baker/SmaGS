@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmaGS Dashboard</title>
+    <meta http-equiv="refresh" content="30">
+    <link rel="stylesheet" href="/static/css/{{ theme }}.css">
+</head>
+<body>
+    <div class="topbar">
+        <div>
+            <h1><span class="leaf">&#127793;</span> Sma<span>GS</span></h1>
+            <div class="subtitle">Smart Greenhouse System</div>
+        </div>
+        <div class="topbar-right">
+            <a href="/devices" class="nav-link">&#9881; Devices</a>
+            <a href="/sessions" class="nav-link">Past Sessions</a>
+            <div class="refresh-badge">&#8635; refreshes every 30s</div>
+            
+            <div class="nav-button">
+                <form action="/set_theme" method="POST">
+                    <label for="theme-select">Interface:</label>
+                    <select name="theme" id="theme-select" onchange="this.form.submit()">
+                        <option value="green" {% if theme == 'green' %}selected{% endif %}>Greenhouse</option>
+                        <option value="midnight" {% if theme == 'midnight' %}selected{% endif %}>Midnight</option>
+                        <option value="classic" {% if theme == 'classic' %}selected{% endif %}>Classic IT</option>
+                    </select>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        
+        <div class="section">
+            <h2>Live Sensor Status</h2>
+            <div class="card-grid">
+                {% if latest %}
+                    {% for row in latest %}
+                    {% set device = device_map.get(row.sensor_id, {"name": row.sensor_id, "visible_metrics": all_metrics}) %}
+                    <div class="device-card">
+                        <div class="device-header">
+                            <span class="device-name">{{ device.name }}</span>
+                            <span class="device-time">{{ row.timestamp.split(' ')[1] }}</span>
+                        </div>
+                        
+                        <div class="metrics-grid">
+                            {% if "soil_moisture" in device.visible_metrics %}
+                            <div class="metric moisture">
+                                <span class="label">Soil Moisture</span>
+                                <span class="value">{{ row.soil_moisture }}%</span>
+                            </div>
+                            {% endif %}
+
+                            {% if "soil_temp" in device.visible_metrics %}
+                            <div class="metric soiltemp">
+                                <span class="label">Soil Temp</span>
+                                <span class="value">{{ row.soil_temp }}°C</span>
+                            </div>
+                            {% endif %}
+
+                            {% if "air_humidity" in device.visible_metrics %}
+                            <div class="metric humidity">
+                                <span class="label">Air Humidity</span>
+                                <span class="value">{{ row.air_humidity }}%</span>
+                            </div>
+                            {% endif %}
+
+                            {% if "air_temp" in device.visible_metrics %}
+                            <div class="metric airtemp">
+                                <span class="label">Air Temp</span>
+                                <span class="value">{{ row.air_temp }}°C</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-data">Waiting for sensor data...</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Recent Log</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sensor</th>
+                        <th>Soil Moist.</th>
+                        <th>Soil Temp</th>
+                        <th>Air Humid.</th>
+                        <th>Air Temp</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in latest %}
+                    {% set device = device_map.get(row.sensor_id, {"name": row.sensor_id}) %}
+                    <tr>
+                        <td>{{ device.name }}</td>
+                        <td class="moisture">{{ row.soil_moisture }}%</td>
+                        <td class="soiltemp">{{ row.soil_temp }}°C</td>
+                        <td class="humidity">{{ row.air_humidity }}%</td>
+                        <td class="airtemp">{{ row.air_temp }}°C</td>
+                        <td class="timestamp-cell">{{ row.timestamp }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <script>
+        // Keep focus on theme select after change for better UX
+        document.getElementById('theme-select').focus();
+    </script>
+
+</body>
+</html>

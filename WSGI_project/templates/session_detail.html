@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmaGS - Session #{{ session.id }}</title>
+    <link rel="stylesheet" href="/static/css/{{ theme }}.css">
+</head>
+<body>
+    <div class="topbar">
+        <div>
+            <h1>&#127793; Sma<span>GS</span> &mdash; Session #{{ session.id }}</h1>
+        </div>
+        <div class="topbar-right">
+            <a href="/sessions" class="nav-link">&#8592; All Sessions</a>
+            <a href="/" class="nav-link">Dashboard</a>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <div class="session-header" style="background: rgba(255,255,255,0.03); border: 1px solid #333; padding: 25px; border-radius: 12px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <div class="session-date" style="font-size: 24px; font-weight: bold; color: #a5d6a7;">
+                    {{ session.start_time[:10] }}
+                </div>
+                <div class="session-times" style="color: #888; margin-top: 5px; font-size: 14px;">
+                    <strong>Started:</strong> {{ session.start_time }} 
+                    {% if session.end_time %}
+                     &middot; <strong>Ended:</strong> {{ session.end_time }}
+                    {% else %}
+                     &middot; <span style="color: #4caf50;">(Current Active Session)</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="reading-stats" style="text-align: right;">
+                <div style="font-size: 32px; font-weight: bold; color: #4caf50;">{{ readings | length }}</div>
+                <div style="font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px;">Total Readings</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Data Log</h2>
+            {% if readings %}
+            <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #333; text-align: left;">
+                        <th style="padding: 12px;">Sensor</th>
+                        <th style="padding: 12px;">Soil Moisture</th>
+                        <th style="padding: 12px;">Soil Temp</th>
+                        <th style="padding: 12px;">Air Humidity</th>
+                        <th style="padding: 12px;">Air Temp</th>
+                        <th style="padding: 12px;">Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in readings %}
+                    {% set device = device_map.get(row.sensor_id, {"name": row.sensor_id}) %}
+                    <tr style="border-bottom: 1px solid #222;">
+                        <td style="padding: 12px; font-weight: bold;">{{ device.name }}</td>
+                        <td style="padding: 12px;" class="moisture">{{ row.soil_moisture }}%</td>
+                        <td style="padding: 12px;" class="soiltemp">{{ row.soil_temp }}°C</td>
+                        <td style="padding: 12px;" class="humidity">{{ row.air_humidity }}%</td>
+                        <td style="padding: 12px;" class="airtemp">{{ row.air_temp }}°C</td>
+                        <td style="padding: 12px; color: #5a7a5a; font-family: monospace; font-size: 13px;">{{ row.timestamp }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="no-data" style="text-align: center; padding: 100px; color: #444;">
+                <p>No sensor readings found for this specific session.</p>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+</body>
+</html>

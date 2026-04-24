@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmaGS - Sessions</title>
+    <link rel="stylesheet" href="/static/css/{{ theme }}.css">
+</head>
+<body>
+    <div class="topbar">
+        <div class="logo-area">
+            <h1>&#127793; Sma<span>GS</span> Sessions</h1>
+        </div>
+        <div class="topbar-right">
+            <a href="/" class="nav-link">&#8592; Back to Dashboard</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="section-header">
+            <h2>Historical Monitoring Sessions</h2>
+            <p class="section-subtitle">Select a session below to view detailed sensor logs from that period.</p>
+        </div>
+
+        {% if sessions %}
+        <div class="session-list">
+            {% for s in sessions %}
+            <a href="/sessions/{{ s.id }}" class="session-card {% if s.id == current_session_id %}active{% endif %}">
+                
+                <div class="session-item-content">
+                    <div class="session-info">
+                        <div class="session-title">
+                            Session #{{ s.id }} &mdash; {{ s.start_time[:10] }}
+                            {% if s.id == current_session_id %}
+                                <span class="active-badge">Live</span>
+                            {% endif %}
+                        </div>
+                        <div class="session-time">
+                            <strong>Started:</strong> {{ s.start_time }}
+                            {% if s.end_time %}
+                             &middot; <strong>Ended:</strong> {{ s.end_time }}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="session-meta">
+                        <div class="reading-count">{{ s.reading_count }}</div>
+                        <div class="meta-label">Readings</div>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="no-data-placeholder">
+            <p>No monitoring sessions found in the database.</p>
+            <p class="sub-text">Data will appear here once the first ESP32 packet is received.</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

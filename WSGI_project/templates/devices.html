@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmaGS - Devices</title>
+    <link rel="stylesheet" href="/static/css/{{ theme }}.css">
+</head>
+<body>
+    <div class="topbar">
+        <div>
+            <h1>&#127793; Sma<span>GS</span> &mdash; Devices</h1>
+        </div>
+        <div class="topbar-right">
+            <a href="/" class="nav-link">&#8592; Dashboard</a>
+            <a href="/sessions" class="nav-link">Sessions</a>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <div class="info-box" style="background: rgba(76, 175, 80, 0.1); border: 1px solid #4caf5055; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 14px;">
+            <strong>Pro Tip:</strong> New ESP32 devices are automatically detected. You can rename sensors here to match their physical location (e.g., "North Tomato Bed") and choose which metrics to display.
+        </div>
+
+        <div class="section">
+            <h2>Registered Devices ({{ devices | length }})</h2>
+
+            {% if devices %}
+                <div class="device-list">
+                {% for dev in devices %}
+                <div class="device-card" style="background: rgba(255,255,255,0.03); border: 1px solid #333; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                    <form action="/update_device" method="POST">
+                        <input type="hidden" name="mac_address" value="{{ dev.mac_address }}">
+                        
+                        <div class="device-settings-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="setting-group">
+                                <label style="display: block; color: #81c784; font-size: 12px; margin-bottom: 5px;">MAC ADDRESS</label>
+                                <code style="background: #000; padding: 4px 8px; border-radius: 4px;">{{ dev.mac_address }}</code>
+                                
+                                <label style="display: block; color: #81c784; font-size: 12px; margin-top: 15px; margin-bottom: 5px;">FRIENDLY NAME</label>
+                                <input type="text" name="name" value="{{ dev.name }}" 
+                                       style="width: 100%; background: #1a1a1a; border: 1px solid #444; color: white; padding: 8px; border-radius: 4px;">
+                            </div>
+
+                            <div class="setting-group">
+                                <label style="display: block; color: #81c784; font-size: 12px; margin-bottom: 10px;">VISIBLE METRICS</label>
+                                <div class="metrics-toggles" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    {% for metric in ["soil_moisture", "soil_temp", "air_humidity", "air_temp"] %}
+                                    <label class="toggle-item" style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px;">
+                                        <input type="checkbox" name="metrics" value="{{ metric }}" 
+                                               {% if metric in dev.visible_metrics %}checked{% endif %}>
+                                        {{ metric.replace('_', ' ').title() }}
+                                    </label>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 20px; text-align: right;">
+                            <button type="submit" class="save-btn" 
+                                    style="background: #4caf50; color: white; border: none; padding: 10px 25px; border-radius: 6px; cursor: pointer; font-weight: bold;">
+                                Save Device Configuration
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                {% endfor %}
+                </div>
+            {% else %}
+                <div class="no-data" style="text-align: center; padding: 50px; color: #666;">
+                    No devices registered yet. ESP32s will appear here once they ping the WSGI API.
+                </div>
+            {% endif %}
+        </div>
+
+    </div>
+</body>
+</html>
