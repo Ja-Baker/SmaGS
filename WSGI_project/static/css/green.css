@@ -1,0 +1,262 @@
+/* SmaGS - Greenhouse Theme (Green)
+A professional, dark-mode greenhouse interface.
+*/
+
+:root {
+    --bg-color: #1a2e1a;
+    --text-color: #e0e0e0;
+    --accent-primary: #4caf50;
+    --accent-secondary: #a5d6a7;
+    --accent-muted: #81c784;
+    --card-bg: rgba(255, 255, 255, 0.03);
+    --border-color: #333;
+    --header-gradient: linear-gradient(135deg, #2d5a27, #1e3d1a);
+    --hover-bg: rgba(76, 175, 80, 0.05);
+    
+    /* Metric Colors */
+    --moisture: #64b5f6;
+    --temp: #ff8a65;
+    --humidity: #4db6ac;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+/* --- Layout Components --- */
+
+.topbar {
+    background: var(--header-gradient);
+    border-bottom: 3px solid var(--accent-primary);
+    padding: 1rem 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.topbar h1 {
+    color: var(--accent-secondary);
+    font-size: 1.8rem;
+}
+
+.topbar h1 span {
+    color: var(--accent-primary);
+}
+
+.subtitle {
+    font-size: 0.8rem;
+    color: var(--accent-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 2rem auto;
+}
+
+.section {
+    margin-bottom: 3rem;
+}
+
+h2 {
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--accent-secondary);
+}
+
+/* --- Navigation & Forms --- */
+
+.nav-link {
+    color: var(--accent-muted);
+    text-decoration: none;
+    margin: 0 10px;
+    font-weight: bold;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+    padding: 5px 12px;
+    border-radius: 4px;
+    transition: 0.3s;
+}
+
+.nav-link:hover {
+    background: var(--hover-bg);
+    border-color: var(--accent-primary);
+}
+
+select {
+    background: #000;
+    color: var(--accent-primary);
+    border: 1px solid var(--accent-primary);
+    padding: 4px;
+    border-radius: 4px;
+}
+
+/* --- Dashboard Device Cards --- */
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.device-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    transition: transform 0.2s;
+}
+
+.device-card:hover {
+    border-color: var(--accent-primary);
+    transform: translateY(-3px);
+}
+
+.device-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #444;
+    padding-bottom: 8px;
+}
+
+.device-name { font-weight: bold; color: var(--accent-secondary); }
+.device-time { font-size: 0.8rem; color: #777; }
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.metric {
+    display: flex;
+    flex-direction: column;
+    padding: 8px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 6px;
+}
+
+.metric .label { font-size: 0.7rem; text-transform: uppercase; color: #888; }
+.metric .value { font-size: 1.1rem; font-weight: bold; }
+
+.metric.moisture .value { color: var(--moisture); }
+.metric.soiltemp .value { color: var(--temp); }
+.metric.humidity .value { color: var(--humidity); }
+.metric.airtemp .value { color: var(--accent-primary); }
+
+/* --- Table Styles (History/Log) --- */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    text-align: left;
+    padding: 12px;
+    background: rgba(0,0,0,0.3);
+    color: var(--accent-muted);
+}
+
+td {
+    padding: 12px;
+    border-bottom: 1px solid #222;
+}
+
+.moisture { color: var(--moisture); }
+.soiltemp { color: var(--temp); }
+.humidity { color: var(--humidity); }
+.airtemp { color: var(--accent-primary); }
+
+/* --- Sessions Page Components --- */
+
+.session-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.session-card {
+    text-decoration: none;
+    color: inherit;
+}
+
+.session-item-content {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    padding: 20px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: 0.2s;
+}
+
+.session-card:hover .session-item-content {
+    border-color: var(--accent-primary);
+    background: var(--hover-bg);
+}
+
+.session-title {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--accent-secondary);
+}
+
+.active-badge {
+    background: var(--accent-primary);
+    color: white;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    text-transform: uppercase;
+}
+
+.reading-count {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--accent-primary);
+}
+
+.meta-label {
+    font-size: 0.7rem;
+    color: #555;
+    text-transform: uppercase;
+}
+
+/* --- Device Settings Page --- */
+
+.info-box {
+    background: rgba(76, 175, 80, 0.1);
+    border: 1px solid rgba(76, 175, 80, 0.3);
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.save-btn {
+    background: var(--accent-primary);
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.save-btn:hover {
+    background: var(--accent-muted);
+}
