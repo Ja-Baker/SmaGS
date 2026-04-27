@@ -1,6 +1,7 @@
 import os
 import json
 import sqlite3
+import pytz
 from datetime import datetime
 from urllib.parse import parse_qs
 from jinja2 import Environment, FileSystemLoader
@@ -14,6 +15,7 @@ DB_PATH = os.path.join(BASE_DIR, os.getenv("DB_PATH", "smags.db"))
 TEMPLATE_DIR = os.path.join(BASE_DIR, "templates")
 STATIC_DIR = os.path.join(BASE_DIR, "static")
 CSS_DIR = os.path.join(STATIC_DIR, "css")
+LOCAS_TZ = pytz.timezone('America/Chicago')
 
 ALL_METRICS = ["soil_moisture", "soil_temp", "air_humidity", "air_temp"]
 
@@ -137,7 +139,7 @@ def handle_api_data(environ, start_response):
     try:
         length = int(environ.get('CONTENT_LENGTH', 0))
         data = json.loads(environ['wsgi.input'].read(length))
-        ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        ts = datetime.now(LOCAS_TZ).strftime("%Y-%m-%d %H:%M:%S")
         
         conn = get_db()
         conn.execute("""
