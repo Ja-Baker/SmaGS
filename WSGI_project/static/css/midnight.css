@@ -1,22 +1,16 @@
-/* SmaGS - Midnight Theme (Blue/Dark)
-   A high-contrast, deep-space aesthetic for late-night monitoring.
-*/
-
 :root {
     --bg-color: #0b0e14;
     --text-color: #d1d5db;
-    --accent-primary: #3b82f6; /* Modern Blue */
+    --accent-primary: #3b82f6; 
     --accent-secondary: #60a5fa;
     --accent-muted: #94a3b8;
     --card-bg: rgba(30, 41, 59, 0.5);
     --border-color: #1e293b;
     --header-gradient: linear-gradient(135deg, #0f172a, #020617);
     --hover-bg: rgba(59, 130, 246, 0.1);
-    
-    /* Metric Colors */
-    --moisture: #0ea5e9; /* Cyan */
-    --temp: #f43f5e;     /* Rose/Red */
-    --humidity: #8b5cf6; /* Violet */
+    --moisture: #0ea5e9; 
+    --temp: #f43f5e;   
+    --humidity: #8b5cf6;
 }
 
 * {
@@ -31,8 +25,6 @@ body {
     color: var(--text-color);
     line-height: 1.6;
 }
-
-/* --- Cookie Consent Banner --- */
 
 .cookie-banner {
     background: #020617;
@@ -71,8 +63,6 @@ body {
     margin-left: 10px;
 }
 
-/* --- Layout Components --- */
-
 .topbar {
     background: var(--header-gradient);
     border-bottom: 2px solid var(--accent-primary);
@@ -107,8 +97,6 @@ body {
     margin: 2rem auto;
 }
 
-/* --- Navigation --- */
-
 .nav-link {
     color: var(--accent-secondary);
     text-decoration: none;
@@ -135,8 +123,6 @@ select {
     border-radius: 4px;
     outline: none;
 }
-
-/* --- Cards & Metrics --- */
 
 .card-grid {
     display: grid;
@@ -192,8 +178,6 @@ select {
 .metric.soiltemp .value { color: var(--temp); }
 .metric.humidity .value { color: var(--humidity); }
 .metric.airtemp .value { color: var(--accent-primary); }
-
-/* --- Table Styles --- */
 
 .table-container {
     overflow-x: auto;

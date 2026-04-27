@@ -1,19 +1,13 @@
-/* SmaGS - Professional Blueprint Theme (Light Mode v2)
-   Clean, architectural drafting aesthetic with optimized spacing.
-*/
-
 :root {
-    --bg-color: #faf8f5;         /* Warm Paper White */
-    --text-color: #1a1a1a;       /* Charcoal Ink */
-    --accent-primary: #2d5a27;   /* Deep Forest Green */
+    --bg-color: #faf8f5;         
+    --text-color: #1a1a1a;       
+    --accent-primary: #2d5a27;   
     --accent-secondary: #4a7c44;
     --accent-muted: #888888;
     --card-bg: #ffffff;
     --border-color: #d1d1d1;
     --header-gradient: linear-gradient(135deg, #2d5a27, #1e3d1a);
     --hover-bg: rgba(45, 90, 39, 0.05);
-    
-    /* Technical Metric Colors */
     --moisture: #0056b3;
     --temp: #c62828;
     --humidity: #00695c;
@@ -40,18 +34,17 @@ body {
     padding: 40px 20px;
 }
 
-/* --- Dashboard Grid Layout (Mirroring Green/Midnight) --- */
 .device-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 24px; /* Consistent spacing */
+    gap: 24px;
     margin-top: 20px;
 }
 
 .device-card {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
-    border-top: 4px solid var(--accent-primary); /* Bold header line */
+    border-top: 4px solid var(--accent-primary);
     padding: 24px;
     border-radius: 0; 
     box-shadow: 6px 6px 0px rgba(0,0,0,0.03);
@@ -81,7 +74,6 @@ body {
     letter-spacing: 0.5px;
 }
 
-/* --- Metrics Display --- */
 .metrics-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -107,16 +99,14 @@ body {
 .metric .value {
     font-size: 1.2rem;
     font-weight: 800;
-    font-family: 'JetBrains Mono', monospace; /* Technical feel */
+    font-family: 'JetBrains Mono', monospace; 
 }
 
-/* Individual Metric Colors for Clarity */
 .metric.moisture .value { color: var(--moisture); }
 .metric.soiltemp .value { color: var(--temp); }
 .metric.humidity .value { color: var(--humidity); }
 .metric.airtemp .value { color: var(--accent-secondary); }
 
-/* --- Table Styling --- */
 .table-container {
     margin-top: 40px;
     background: white;
@@ -145,7 +135,6 @@ td {
     font-size: 0.9rem;
 }
 
-/* --- Controls & Toggles --- */
 .save-btn {
     background: var(--accent-primary) !important;
     color: white !important;

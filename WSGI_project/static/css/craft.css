@@ -1,24 +1,18 @@
-/* SmaGS - Minecraft Edition
-   A blocky, pixel-art inspired theme for the Greenhouse.
-*/
-
 @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
 
 :root {
-    --bg-color: #313131; /* Deep Gray */
+    --bg-color: #313131; 
     --text-color: #e0e0e0;
-    --accent-primary: #55FF55; /* Lime Green */
-    --accent-secondary: #FFFF55; /* Yellow */
-    --accent-muted: #AAAAAA; /* Silver */
+    --accent-primary: #55FF55; 
+    --accent-secondary: #FFFF55; 
+    --accent-muted: #AAAAAA; 
     --card-bg: #4c4c4c;
     --border-color: #000000;
     --header-bg: #262626;
     --hover-bg: #5a5a5a;
-    
-    /* Minecraft Metric Colors */
-    --moisture: #5555FF; /* Blue */
-    --temp: #FFAA00;     /* Gold */
-    --humidity: #38fedb; /* Diamond */
+    --moisture: #5555FF; 
+    --temp: #FFAA00;    
+    --humidity: #38fedb; 
 }
 
 * {
@@ -35,8 +29,6 @@ body {
     font-size: 1.4rem;
     image-rendering: pixelated;
 }
-
-/* --- Cookie Consent Banner (Chest Style) --- */
 
 .cookie-banner {
     background: #262626;
@@ -71,8 +63,6 @@ body {
     border-left-color: #707070;
 }
 
-/* --- Layout Components --- */
-
 .topbar {
     background-color: var(--header-bg);
     border-bottom: 4px solid #000;
@@ -92,7 +82,6 @@ body {
     color: var(--accent-primary);
 }
 
-/* Splash Text Logic */
 @keyframes splash-pulse {
     0% { transform: scale(1) rotate(-15deg); }
     50% { transform: scale(1.1) rotate(-15deg); }
@@ -115,7 +104,6 @@ body {
     margin: 2rem auto;
 }
 
-/* --- Navigation & Forms --- */
 
 .nav-link {
     background: #707070;
@@ -141,7 +129,6 @@ select {
     padding: 2px 5px;
 }
 
-/* --- Dashboard Cards --- */
 
 .card-grid {
     display: grid;
@@ -187,7 +174,6 @@ select {
 .metric.humidity .value { color: var(--humidity); }
 .metric.airtemp .value { color: var(--accent-primary); }
 
-/* --- Table Styles --- */
 
 .table-container {
     overflow-x: auto;

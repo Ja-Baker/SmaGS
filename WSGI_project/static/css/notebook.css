@@ -1,40 +1,33 @@
-/* SmaGS - Student Notebook Theme
-   Loose-leaf paper background with Sticky Note device cards.
-*/
-
 :root {
     --bg-color: #fdfdfd;
     --text-color: #2c3e50;
-    --accent-primary: #3498db; /* Blue pen color */
-    --accent-secondary: #e74c3c; /* Red margin color */
+    --accent-primary: #3498db; 
+    --accent-secondary: #e74c3c; 
     --accent-muted: #95a5a6;
-    --card-bg: #fff9c4; /* Classic Yellow Sticky Note */
+    --card-bg: #fff9c4; 
     --border-color: #dcdde1;
     --header-gradient: linear-gradient(135deg, #3498db, #2980b9);
     --hover-bg: rgba(52, 152, 219, 0.05);
-    
-    /* Marker/Pen Colors for Metrics */
     --moisture: #0984e3;
     --temp: #d63031;
     --humidity: #00b894;
 }
 
 body {
-    font-family: 'Comic Sans MS', 'cursive', sans-serif; /* Best for 'handwritten' feel */
+    font-family: 'Comic Sans MS', 'cursive', sans-serif; 
     background-color: var(--bg-color);
-    /* Create the loose-leaf paper lines */
     background-image: 
         linear-gradient(90deg, transparent 79px, var(--accent-secondary) 79px, var(--accent-secondary) 81px, transparent 81px),
         linear-gradient(#eee .1em, transparent .1em);
     background-size: 100% 1.5em;
-    padding-left: 80px; /* Space for the red margin line */
+    padding-left: 80px; 
 }
 
 .topbar {
     background: var(--header-gradient);
     border-bottom: 3px solid #2980b9;
     padding: 10px 20px;
-    margin-left: -80px; /* Align to edge */
+    margin-left: -80px; 
 }
 
 .topbar h1 {
@@ -42,7 +35,6 @@ body {
     color: white;
 }
 
-/* --- The Sticky Note Cards --- */
 .device-list {
     display: flex;
     flex-wrap: wrap;
@@ -58,18 +50,15 @@ body {
     box-shadow: 5px 5px 10px rgba(0,0,0,0.1);
     border: none;
     position: relative;
-    /* Slight rotation for the "tossed on the desk" look */
     transform: rotate(-1deg);
     transition: transform 0.2s ease;
 }
 
-/* Alternate rotation for every second sticky note */
 .device-card:nth-child(even) {
     transform: rotate(2deg);
-    background: #ffecb3; /* Slightly different yellow */
+    background: #ffecb3; 
 }
 
-/* Pink sticky note for every third */
 .device-card:nth-child(3n) {
     transform: rotate(-1.5deg);
     background: #f8bbd0;
@@ -81,7 +70,6 @@ body {
     z-index: 10;
 }
 
-/* The "Tape" at the top of the sticky note */
 .device-card::before {
     content: "";
     position: absolute;
@@ -118,7 +106,6 @@ body {
     font-weight: bold;
 }
 
-/* --- Form Controls --- */
 input[type="text"] {
     background: rgba(255,255,255,0.5) !important;
     border: none !important;

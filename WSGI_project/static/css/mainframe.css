@@ -1,12 +1,8 @@
-/* SmaGS - Mainframe Theme (Amber CRT)
-   A retro-tech aesthetic with scanlines and glow effects.
-*/
-
 @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap');
 
 :root {
     --bg-color: #0d0a00;
-    --text-color: #ffb000; /* Classic Amber */
+    --text-color: #ffb000; 
     --accent-primary: #ffb000;
     --accent-secondary: #ffcc00;
     --accent-muted: #845d00;
@@ -14,8 +10,6 @@
     --border-color: #ffb000;
     --header-gradient: linear-gradient(180deg, #1a1400, #0d0a00);
     --hover-bg: rgba(255, 176, 0, 0.15);
-    
-    /* Monochrome Metric Colors */
     --moisture: #ffb000;
     --temp: #ffb000;
     --humidity: #ffb000;
@@ -27,7 +21,6 @@
     box-sizing: border-box;
 }
 
-/* CRT Scanline Overlay Effect - Adjusted z-index to allow clicks */
 body::before {
     content: " ";
     display: block;
@@ -35,7 +28,7 @@ body::before {
     top: 0; left: 0; bottom: 0; right: 0;
     background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
                 linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-    z-index: 5; /* Lowered so UI elements stay on top */
+    z-index: 5; 
     background_size: 100% 4px, 3px 100%;
     pointer-events: none;
 }
@@ -49,7 +42,6 @@ body {
     animation: flicker 0.15s infinite;
 }
 
-/* --- Cookie Consent Banner --- */
 .cookie-banner {
     background: #000;
     border: 2px solid var(--accent-primary);
@@ -94,7 +86,7 @@ body {
     padding: 1.5rem 5%;
     background: var(--header-gradient);
     position: relative;
-    z-index: 100; /* Above scanlines */
+    z-index: 100; 
 }
 
 .topbar h1 {
@@ -117,7 +109,6 @@ body {
     z-index: 100;
 }
 
-/* --- Device Cards --- */
 .card-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -149,7 +140,6 @@ body {
     text-shadow: 0 0 8px var(--accent-primary);
 }
 
-/* --- Navigation & Interaction --- */
 .nav-link, select {
     background: transparent;
     border: 1px solid var(--accent-primary);
@@ -165,7 +155,6 @@ body {
     color: #000;
 }
 
-/* --- Table --- */
 .table-container {
     overflow-x: auto;
     border: 1px solid var(--accent-muted);
@@ -189,7 +178,6 @@ td {
     border-bottom: 1px solid var(--accent-muted);
 }
 
-/* Retro flicker animation */
 @keyframes flicker {
     0% { opacity: 0.99; }
     5% { opacity: 0.98; }
