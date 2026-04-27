@@ -275,6 +275,27 @@ def handle_update_device(environ, start_response):
     start_response("405 Method Not Allowed", [("Content-Type", "text/plain")])
     return [b"Method Not Allowed"]
 
+def handle_sensor_history(environ, start_response):
+    """API Endpoint for Chart.js historical data."""
+    path = environ.get('PATH_INFO', '')
+    sensor_id = path.split('/')[-1]
+    params = parse_qs(environ.get('QUERY_STRING', ''))
+    hours = int(params.get('hours', [24])[0])
+    
+    conn = get_db()
+    query = """
+        SELECT timestamp, soil_moisture, soil_temp, air_humidity, air_temp 
+        FROM sensor_data 
+        WHERE sensor_id = ? AND timestamp >= datetime('now', ?) 
+        ORDER BY timestamp ASC
+    """
+    history = conn.execute(query, (sensor_id, f'-{hours} hours')).fetchall()
+    conn.close()
+
+    content = json.dumps([dict(row) for row in history]).encode('utf-8')
+    start_response("200 OK", [("Content-Type", "application/json")])
+    return [content]
+
 # --- MAIN WSGI APP ---
 
 def application(environ, start_response):
@@ -295,6 +316,8 @@ def application(environ, start_response):
         return handle_devices(environ, start_response)
     elif path == "/update_device":
         return handle_update_device(environ, start_response)
+    elif path == "/api/history/":
+        return handle_sensor_history(environ, start_response)
     
     # Static File Server
     elif path.startswith("/static/"):

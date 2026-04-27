@@ -219,6 +219,27 @@
             </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <div id="chartModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="chart-controls">
+                <h3 id="modalSensorName">Sensor Analytics</h3>
+                <select id="timeRange" onchange="updateChartData()">
+                    <option value="1">Last Hour</option>
+                    <option value="6">Last 6 Hours</option>
+                    <option value="24" selected>Last 24 Hours</option>
+                    <option value="168">Last Week</option>
+                </select>
+                <div id="metricToggles">
+                    <label><input type="checkbox" class="metric-toggle" value="soil_moisture" checked> Soil Moisture</label>
+                    <label><input type="checkbox" class="metric-toggle" value="soil_temp" checked> Soil Temp</label>
+                </div>
+            </div>
+            <canvas id="historyChart"></canvas>
+        </div>
+    </div>
 
     <script>
         function changeTheme(selectElement) {
