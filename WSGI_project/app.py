@@ -21,6 +21,7 @@ ALL_METRICS = ["soil_moisture", "soil_temp", "air_humidity", "air_temp"]
 
 # Setup Jinja2
 jinja_env = Environment(loader=FileSystemLoader(TEMPLATE_DIR))
+env = Environment(loader=FileSystemLoader(TEMPLATE_DIR))
 
 # --- DATABASE & COOKIE HELPERS ---
 def get_db():
@@ -72,15 +73,18 @@ def handle_index(environ, start_response):
     themes_list = get_available_themes()
     
     conn = get_db()
-    # Fetch data for live cards and history table
     latest_data = conn.execute("SELECT * FROM sensor_data ORDER BY timestamp DESC LIMIT 20").fetchall()
     
-    # Map MAC addresses to friendly names
-    devices_raw = conn.execute("SELECT * FROM devices").fetchall()
-    device_map = {d['mac_address']: {"name": d['name'], "visible_metrics": json.loads(d['visible_metrics'])} for d in devices_raw}
+    devices_raw = conn.execute("SELECT sensor_id, name FROM devices").fetchall()
+    device_map = {
+        d['sensor_id']: {
+            "name": d['name'], 
+            "visible_metrics": []
+        } for d in devices_raw
+    }
     conn.close()
 
-    template = jinja_env.get_template("index.html")
+    template = env.get_template("index.html")
     content = template.render(
         latest=latest_data, 
         device_map=device_map, 
@@ -94,30 +98,36 @@ def handle_index(environ, start_response):
     return [content]
 
 def handle_devices(environ, start_response):
-    """Renders the device management page."""
     consented = get_cookie(environ, 'cookie_consent', 'false') == 'true'
     theme = get_cookie(environ, 'theme', 'green') if consented else 'green'
 
     conn = get_db()
-    device_rows = conn.execute('SELECT mac_address, name, visible_metrics FROM devices').fetchall()
+    device_rows = conn.execute("SELECT * FROM devices").fetchall()
     conn.close()
     
-    device_map = {}
+    device_list = []
     for row in device_rows:
-        device_map[row['mac_address']] = {
-            "name": row['name'],
-            "visible_metrics": json.loads(row['visible_metrics'])
-        }
+        d = dict(row)
+        raw_metrics = d.get('visible_metrics')
+        if raw_metrics:
+            try:
+                d['visible_metrics'] = json.loads(raw_metrics)
+            except:
+                d['visible_metrics'] = ALL_METRICS
+        else:
+            d['visible_metrics'] = ALL_METRICS
+            
+        device_list.append(d)
 
     template = env.get_template('devices.html')
-    output = template.render(
-        device_map=device_map,
-        theme=theme,
+    content = template.render(
+        devices=device_list, 
+        theme=theme, 
         consented=consented
-    ).encode('utf-8')
+    ).encode("utf-8")
 
     start_response("200 OK", [("Content-Type", "text/html")])
-    return [output]
+    return [content]
 
 def handle_set_theme(environ, start_response):
     """Handles theme updates via 303 Redirect."""
@@ -159,27 +169,51 @@ def handle_accept_cookies(environ, start_response):
     return [b""]
 
 def handle_api_data(environ, start_response):
-    """Endpoint for ESP32/Pi sensor nodes."""
+    """Endpoint for ESP32/Pi sensor nodes with Session Healing and Auto-Registration."""
     if environ.get('REQUEST_METHOD') != 'POST':
         start_response("405 Method Not Allowed", [("Content-Type", "text/plain")])
         return [b"Method Not Allowed"]
+    
     try:
         length = int(environ.get('CONTENT_LENGTH', 0))
         data = json.loads(environ['wsgi.input'].read(length))
-        ts = datetime.now(LOCAL_TZ).strftime("%Y-%m-%d %H:%M:%S")
+        
+        mac = data.get("mac_address") or data.get("sensor_id")
         
         conn = get_db()
-        conn.execute("""
-            INSERT INTO sensor_data (sensor_id, soil_moisture, soil_temp, air_humidity, air_temp, timestamp)
-            VALUES (?, ?, ?, ?, ?, ?)
-        """, (data["mac_address"], data["soil_moisture"], data["soil_temp"], data["air_humidity"], data["air_temp"], ts))
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT sensor_id FROM devices WHERE sensor_id = ?", (mac,))
+        if not cursor.fetchone():
+            cursor.execute("INSERT INTO devices (sensor_id, name) VALUES (?, ?)", 
+                           (mac, f"New Sensor ({mac[-5:]})"))
+
+        cursor.execute("SELECT id FROM sessions WHERE status = 'active' ORDER BY id DESC LIMIT 1")
+        row = cursor.fetchone()
+        if row:
+            session_id = row[0]
+        else:
+            cursor.execute("INSERT INTO sessions (status) VALUES ('active')")
+            session_id = cursor.lastrowid
+
+        ts = datetime.now(LOCAL_TZ).strftime("%Y-%m-%d %H:%M:%S")
+
+        cursor.execute("""
+            INSERT INTO sensor_data 
+            (session_id, sensor_id, soil_moisture, soil_temp, air_humidity, air_temp, timestamp)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (session_id, mac, data["soil_moisture"], data["soil_temp"], 
+              data["air_humidity"], data["air_temp"], ts))
+
         conn.commit()
         conn.close()
 
         start_response("200 OK", [("Content-Type", "application/json")])
-        return [json.dumps({"status": "success"}).encode("utf-8")]
+        return [json.dumps({"status": "success", "session": session_id}).encode("utf-8")]
+
     except Exception as e:
-        start_response("400 Bad Request", [])
+        print(f"API Error: {e}")
+        start_response("400 Bad Request", [("Content-Type", "text/plain")])
         return [str(e).encode("utf-8")]
 
 # --- MAIN WSGI APP ---
