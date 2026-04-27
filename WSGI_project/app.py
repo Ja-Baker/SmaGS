@@ -82,10 +82,9 @@ def handle_favicon(environ, start_response):
 
 
 def handle_index(environ, start_response):
-    """Main Dashboard Route - Hybrid Server/Cookie Logic."""
+    """Main Dashboard Route - Updated to handle nested Cookie preferences."""
     consented = get_cookie(environ, 'cookie_consent', 'false') == 'true'
     theme = get_cookie(environ, 'theme', 'green') if consented else 'green'
-
     visibility_prefs = {}
     cookie_str = environ.get('HTTP_COOKIE', '')
     if 'device_visibility=' in cookie_str:
@@ -106,10 +105,15 @@ def handle_index(environ, start_response):
     device_map = {}
     for d in devices_raw:
         s_id = d['sensor_id']
-        user_visible = visibility_prefs.get(s_id, ALL_METRICS)
+        sensor_config = visibility_prefs.get(s_id, {})
+        
+        user_visible = sensor_config.get("metrics", ALL_METRICS)
+        user_unit = sensor_config.get("unit", "C") 
+
         device_map[s_id] = {
             "name": d['name'], 
-            "visible_metrics": user_visible
+            "visible_metrics": user_visible,
+            "unit": user_unit
         }
     template = env.get_template("index.html")
     content = template.render(
@@ -249,21 +253,26 @@ def handle_update_device(environ, start_response):
         try:
             request_body_size = int(environ.get('CONTENT_LENGTH', 0))
             request_body = environ['wsgi.input'].read(request_body_size).decode('utf-8')
+            from urllib.parse import parse_qs
             params = parse_qs(request_body)
             sensor_id = params.get('sensor_id', [None])[0]
             new_name = params.get('name', ['Unnamed Sensor'])[0]
             if sensor_id:
                 conn = get_db()
-                conn.execute("UPDATE devices SET name = ? WHERE sensor_id = ?", (new_name, sensor_id))
+                conn.execute("""
+                    UPDATE devices 
+                    SET name = ? 
+                    WHERE sensor_id = ?
+                """, (new_name, sensor_id))
                 conn.commit()
                 conn.close()
             start_response("303 See Other", [("Location", "/devices")])
             return [b""]
         except Exception as e:
+            print(f"Error updating device name: {e}")
             start_response("500 Internal Server Error", [("Content-Type", "text/plain")])
             return [str(e).encode('utf-8')]
-            
-    start_response("405 Method Not Allowed", [])
+    start_response("405 Method Not Allowed", [("Content-Type", "text/plain")])
     return [b"Method Not Allowed"]
 
 # --- MAIN WSGI APP ---

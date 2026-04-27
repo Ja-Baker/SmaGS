@@ -10,17 +10,17 @@
 <body>
     <div class="topbar">
         <div>
-            <h1>&#127793; Sma<span>GS</span> &mdash; Devices</h1>
+            <h1>🌱 Sma<span>GS</span> &mdash; Devices</h1>
         </div>
         <div class="topbar-right">
-            <a href="/" class="nav-link">&#8592; Dashboard</a>
+            <a href="/" class="nav-link">← Dashboard</a>
             <a href="/sessions" class="nav-link">Sessions</a>
         </div>
     </div>
 
     <div class="container">
         <div class="info-box" style="background: var(--hover-bg); border: 1px solid var(--accent-primary); padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; color: var(--text-color);">
-            <strong>Pro Tip:</strong> New ESP32 devices are automatically detected. You can rename sensors here to match their physical location and choose which metrics to display locally.
+            <strong>Local Preferences:</strong> Temperature units and display metrics are saved to <em>this browser</em>. Sensor names are saved to the database.
         </div>
 
         <div class="section">
@@ -29,8 +29,8 @@
             {% if devices %}
                 <div class="device-list">
                 {% for dev in devices %}
-                <div class="device-card">
-                    <form action="/update_device" method="POST">
+                <div class="device-card" id="card-{{ dev.sensor_id }}">
+                    <form action="/update_device" method="POST" onsubmit="saveLocalConfig('{{ dev.sensor_id }}')">
                         <input type="hidden" name="sensor_id" value="{{ dev.sensor_id }}">
                         
                         <div class="device-settings-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
@@ -38,19 +38,28 @@
                                 <label style="display: block; color: var(--accent-muted); font-size: 11px; margin-bottom: 5px; letter-spacing: 1px;">SENSOR ID / MAC</label>
                                 <code style="background: rgba(0,0,0,0.3); color: var(--accent-secondary); padding: 4px 8px; border-radius: 4px; font-family: monospace;">{{ dev.sensor_id }}</code>
                                 
-                                <label style="display: block; color: var(--accent-muted); font-size: 11px; margin-top: 15px; margin-bottom: 5px; letter-spacing: 1px;">FRIENDLY NAME</label>
+                                <label style="display: block; color: var(--accent-muted); font-size: 11px; margin-top: 15px; margin-bottom: 5px; letter-spacing: 1px;">FRIENDLY NAME (Global)</label>
                                 <input type="text" name="name" value="{{ dev.name }}" 
                                        style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); color: var(--text-color); padding: 10px; border-radius: 6px;">
                             </div>
 
                             <div class="setting-group">
-                                <label style="display: block; color: var(--accent-muted); font-size: 11px; margin-bottom: 10px; letter-spacing: 1px;">DISPLAY PREFERENCES</label>
+                                <label style="display: block; color: var(--accent-muted); font-size: 11px; margin-bottom: 10px; letter-spacing: 1px;">LOCAL PREFERENCES (This Browser)</label>
+                                
+                                <div style="display: flex; gap: 15px; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px dashed var(--border-color);">
+                                    <label style="cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 5px;">
+                                        <input type="radio" name="temp_unit_local" value="F" checked> °F
+                                    </label>
+                                    <label style="cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 5px;">
+                                        <input type="radio" name="temp_unit_local" value="C"> °C
+                                    </label>
+                                </div>
+
                                 <div class="metrics-toggles" style="display: grid; grid-template-columns: 1fr; gap: 8px;">
-                                    {% for metric in all_metrics %}
+                                    {% for metric in ["soil_moisture", "soil_temp", "air_humidity", "air_temp"] %}
                                     <label class="toggle-item" style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; color: var(--text-color);">
-                                        <input type="checkbox" name="metrics" value="{{ metric }}" 
-                                               style="accent-color: var(--accent-primary); transform: scale(1.2);"
-                                               {% if metric in dev.visible_metrics %}checked{% endif %}>
+                                        <input type="checkbox" name="metrics_local" value="{{ metric }}" class="metric-checkbox"
+                                               style="accent-color: var(--accent-primary); transform: scale(1.2);">
                                         {{ metric.replace('_', ' ').title() }}
                                     </label>
                                     {% endfor %}
@@ -59,41 +68,73 @@
                         </div>
 
                         <div style="margin-top: 25px; text-align: right; border-top: 1px solid var(--border-color); padding-top: 15px;">
-                            <button type="submit" class="save-btn" onclick="saveDeviceConfig(event, '{{ dev.sensor_id }}')"
-                                    style="background: var(--accent-primary); color: #000; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: opacity 0.2s;">
-                                Save Settings
+                            <button type="submit" class="save-btn" 
+                                    style="background: var(--accent-primary); color: #000; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;">
+                                Save All Settings
                             </button>
                         </div>
                     </form>
                 </div>
                 {% endfor %}
                 </div>
-            {% else %}
-                <div class="no-data" style="text-align: center; padding: 80px; color: var(--accent-muted); background: var(--card-bg); border-radius: 12px; border: 1px dashed var(--border-color);">
-                    <div style="font-size: 40px; margin-bottom: 15px;">📡</div>
-                    No devices registered yet.<br>Connect an ESP32 to the API to begin monitoring.
-                </div>
             {% endif %}
         </div>
     </div>
 
     <script>
-    function saveDeviceConfig(event, sensorId) {on
-        const card = event.target.closest('.device-card');
-        const checkedBoxes = card.querySelectorAll('input[name="metrics"]:checked');
-        const selectedMetrics = Array.from(checkedBoxes).map(cb => cb.value);
-        let visibilityData = {};
+    // Load local cookie preferences
+    window.onload = function() {
         const cookieValue = document.cookie.split('; ').find(row => row.startsWith('device_visibility='));
         if (cookieValue) {
             try {
-                visibilityData = JSON.parse(decodeURIComponent(cookieValue.split('=')[1]));
-            } catch(e) {
-                console.error("Cookie parse error:", e);
-                visibilityData = {};
-            }
+                const configData = JSON.parse(decodeURIComponent(cookieValue.split('=')[1]));
+                for (const [sensorId, config] of Object.entries(configData)) {
+                    const card = document.getElementById(`card-${sensorId}`);
+                    if (card) {
+                        // Load Metric Checkboxes
+                        if(config.metrics) {
+                            config.metrics.forEach(m => {
+                                const cb = card.querySelector(`input[value="${m}"]`);
+                                if (cb) cb.checked = true;
+                            });
+                        }
+                        // Load Temp Unit Radio
+                        if(config.unit) {
+                            const radio = card.querySelector(`input[name="temp_unit_local"][value="${config.unit}"]`);
+                            if (radio) radio.checked = true;
+                        }
+                    }
+                }
+            } catch(e) { console.error("Cookie load error:", e); }
         }
-        visibilityData[sensorId] = selectedMetrics;
-        const jsonStr = encodeURIComponent(JSON.stringify(visibilityData));
+    };
+
+    // Save Metric + Unit preferences to Cookie
+    function saveLocalConfig(sensorId) {
+        const card = document.getElementById(`card-${sensorId}`);
+        
+        // Grab metrics
+        const checkedBoxes = card.querySelectorAll('input[name="metrics_local"]:checked');
+        const selectedMetrics = Array.from(checkedBoxes).map(cb => cb.value);
+        
+        // Grab unit
+        const selectedUnit = card.querySelector('input[name="temp_unit_local"]:checked').value;
+
+        let configData = {};
+        const cookieValue = document.cookie.split('; ').find(row => row.startsWith('device_visibility='));
+        if (cookieValue) {
+            try {
+                configData = JSON.parse(decodeURIComponent(cookieValue.split('=')[1]));
+            } catch(e) { configData = {}; }
+        }
+
+        // Save both metrics and unit into the object for this sensor
+        configData[sensorId] = {
+            metrics: selectedMetrics,
+            unit: selectedUnit
+        };
+
+        const jsonStr = encodeURIComponent(JSON.stringify(configData));
         document.cookie = `device_visibility=${jsonStr}; path=/; max-age=31536000; SameSite=Lax`;
     }
     </script>

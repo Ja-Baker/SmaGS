@@ -5,23 +5,28 @@ import os
 DB_PATH = "smags.db"
 
 def setup_database():
-    # Remove old DB if you want a totally fresh start (Optional)
-    # if os.path.exists(DB_PATH): os.remove(DB_PATH)
-
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
     print("--- Initializing SmaGS Database ---")
 
-    # 1. Create Devices Table
-    # Added 'visible_metrics' which is required for the new dashboard
+    # 1. Create/Update Devices Table
+    # Added 'temp_unit' to store 'F' or 'C' preference
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS devices (
             sensor_id TEXT PRIMARY KEY,
             name TEXT NOT NULL,
-            visible_metrics TEXT DEFAULT '["soil_moisture", "soil_temp", "air_humidity", "air_temp"]'
+            visible_metrics TEXT DEFAULT '["soil_moisture", "soil_temp", "air_humidity", "air_temp"]',
+            temp_unit TEXT DEFAULT 'F'
         )
     ''')
+
+    # Migration Check: If the table existed but doesn't have temp_unit, add it
+    cursor.execute("PRAGMA table_info(devices)")
+    columns = [column[1] for column in cursor.fetchall()]
+    if 'temp_unit' not in columns:
+        print("Migrating: Adding 'temp_unit' column to devices table...")
+        cursor.execute("ALTER TABLE devices ADD COLUMN temp_unit TEXT DEFAULT 'F'")
 
     # 2. Create Sessions Table
     cursor.execute('''
@@ -49,8 +54,7 @@ def setup_database():
         )
     ''')
 
-    # 4. PRE-REGISTER YOUR SENSORS (Optional but helpful)
-    # This ensures your sensors show up on the Devices page immediately
+    # 4. PRE-REGISTER YOUR SENSORS
     known_sensors = [
         ('378:1C:3C:B8:EE:6C', 'Greenhouse Alpha'),
         ('36C:C8:40:93:F7:04', 'Greenhouse Beta')
@@ -69,7 +73,7 @@ def setup_database():
 
     conn.commit()
     conn.close()
-    print("Success: Database schema is ready for the dashboard!")
+    print("Success: Database schema (including Temp Units) is ready!")
 
 if __name__ == "__main__":
     setup_database()

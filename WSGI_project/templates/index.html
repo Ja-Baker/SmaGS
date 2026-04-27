@@ -11,10 +11,9 @@
     
     <style>
         :root {
-            --accent-primary: #2ecc71; /* Fallback for the JS glow effect */
+            --accent-primary: #2ecc71; 
         }
 
-        /* Styles for the Self-Healing Error Popup */
         .error-popup {
             position: fixed;
             bottom: 25px;
@@ -47,13 +46,11 @@
         .popup-icon { font-size: 24px; }
         .popup-text strong { display: block; font-size: 1.1em; margin-bottom: 2px; }
 
-        /* Loading state for the theme picker */
         .theme-picker select:disabled {
             opacity: 0.6;
             cursor: wait;
         }
 
-        /* Basic styling for the POST-based cookie button */
         .accept-btn {
             background: #2ecc71;
             color: white;
@@ -119,7 +116,8 @@
                     {% set seen = namespace(sensors=[]) %}
                     {% for row in latest %}
                         {% if row.sensor_id not in seen.sensors %}
-                            {% set device = device_map.get(row.sensor_id, {"name": row.sensor_id, "visible_metrics": all_metrics}) %}
+                            {# Fetch device info including cookie-based visibility and units #}
+                            {% set device = device_map.get(row.sensor_id, {"name": row.sensor_id, "visible_metrics": all_metrics, "unit": "C"}) %}
                             <div class="device-card">
                                 <div class="device-header">
                                     <span class="device-name">{{ device.name }}</span>
@@ -132,22 +130,37 @@
                                         <span class="value">{{ row.soil_moisture }}%</span>
                                     </div>
                                     {% endif %}
+
                                     {% if "soil_temp" in device.visible_metrics %}
                                     <div class="metric soiltemp">
                                         <span class="label">Soil Temp</span>
-                                        <span class="value">{{ row.soil_temp }}°C</span>
+                                        <span class="value">
+                                            {% if device.unit == 'F' %}
+                                                {{ ((row.soil_temp * 9/5) + 32) | round(1) }}°F
+                                            {% else %}
+                                                {{ row.soil_temp }}°C
+                                            {% endif %}
+                                        </span>
                                     </div>
                                     {% endif %}
+
                                     {% if "air_humidity" in device.visible_metrics %}
                                     <div class="metric humidity">
                                         <span class="label">Air Humidity</span>
                                         <span class="value">{{ row.air_humidity }}%</span>
                                     </div>
                                     {% endif %}
+
                                     {% if "air_temp" in device.visible_metrics %}
                                     <div class="metric airtemp">
                                         <span class="label">Air Temp</span>
-                                        <span class="value">{{ row.air_temp }}°C</span>
+                                        <span class="value">
+                                            {% if device.unit == 'F' %}
+                                                {{ ((row.air_temp * 9/5) + 32) | round(1) }}°F
+                                            {% else %}
+                                                {{ row.air_temp }}°C
+                                            {% endif %}
+                                        </span>
                                     </div>
                                     {% endif %}
                                 </div>
@@ -179,13 +192,25 @@
                     </thead>
                     <tbody>
                         {% for row in latest %}
-                        {% set device = device_map.get(row.sensor_id, {"name": row.sensor_id}) %}
+                        {% set device = device_map.get(row.sensor_id, {"name": row.sensor_id, "unit": "C"}) %}
                         <tr>
                             <td><strong>{{ device.name }}</strong></td>
                             <td>{{ row.soil_moisture }}%</td>
-                            <td>{{ row.soil_temp }}°C</td>
+                            <td>
+                                {% if device.unit == 'F' %}
+                                    {{ ((row.soil_temp * 9/5) + 32) | round(1) }}°F
+                                {% else %}
+                                    {{ row.soil_temp }}°C
+                                {% endif %}
+                            </td>
                             <td>{{ row.air_humidity }}%</td>
-                            <td>{{ row.air_temp }}°C</td>
+                            <td>
+                                {% if device.unit == 'F' %}
+                                    {{ ((row.air_temp * 9/5) + 32) | round(1) }}°F
+                                {% else %}
+                                    {{ row.air_temp }}°C
+                                {% endif %}
+                            </td>
                             <td class="timestamp-cell">{{ row.timestamp }}</td>
                         </tr>
                         {% endfor %}
@@ -196,33 +221,20 @@
     </div>
 
     <script>
-        /**
-         * RESILIENT THEME SWITCHER
-         */
         function changeTheme(selectElement) {
-            window.stop(); // Prevent page refresh interference
+            window.stop(); 
             selectElement.disabled = true;
-            
-            console.log("SmaGS: Switching theme, activating 5s watchdog...");
-
             const themeWatchdog = setTimeout(() => {
-                console.warn("SmaGS: Deadlock detected. Forcing recovery...");
                 window.location.href = "/?recovered=true"; 
             }, 5000); 
-
             selectElement.form.submit();
         }
 
-        /**
-         * INITIALIZATION & RECOVERY
-         */
         window.onload = () => {
             const urlParams = new URLSearchParams(window.location.search);
-            
             if (urlParams.has('recovered')) {
                 showErrorPopup("Connection Reset", "The dashboard recovered from a temporary server hang.");
             }
-
             if (urlParams.has('theme_updated')) {
                 const select = document.getElementById('theme-select');
                 if (select) {
@@ -242,9 +254,7 @@
                     <span>${message}</span>
                 </div>
             `;
-            
             document.body.appendChild(popup);
-
             setTimeout(() => {
                 popup.classList.add('fade-out');
                 setTimeout(() => popup.remove(), 1000);
