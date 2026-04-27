@@ -161,32 +161,24 @@ def handle_devices(environ, start_response):
     return [content]
 
 def handle_sessions(environ, start_response):
-    consented = get_cookie(environ, 'cookie_consent', 'false') == 'true'
-    theme = get_cookie(environ, 'theme', 'green') if consented else 'green'
-
+    """Lists all monitoring sessions with summary stats."""
     conn = get_db()
-    device_rows = conn.execute("SELECT * FROM devices").fetchall()
+    sessions = conn.execute("""
+        SELECT s.*, 
+               (SELECT COUNT(*) FROM sensor_data WHERE session_id = s.id) as reading_count,
+               (SELECT MIN(timestamp) FROM sensor_data WHERE session_id = s.id) as start_time,
+               (SELECT MAX(timestamp) FROM sensor_data WHERE session_id = s.id) as end_time
+        FROM sessions s
+        ORDER BY s.id DESC
+    """).fetchall()
+    current_session_id = sessions[0]['id'] if sessions else None
     conn.close()
-    
-    device_list = []
-    for row in device_rows:
-        d = dict(row)
-        raw_metrics = d.get('visible_metrics')
-        if raw_metrics:
-            try:
-                d['visible_metrics'] = json.loads(raw_metrics)
-            except:
-                d['visible_metrics'] = ALL_METRICS
-        else:
-            d['visible_metrics'] = ALL_METRICS
-            
-        device_list.append(d)
 
-    template = env.get_template('sessions.html')
+    template = env.get_template("sessions.html")
     content = template.render(
-        devices=device_list, 
-        theme=theme, 
-        consented=consented
+        sessions=sessions,
+        current_session_id=current_session_id,
+        theme=get_cookie(environ, 'theme', 'green')
     ).encode("utf-8")
 
     start_response("200 OK", [("Content-Type", "text/html")])
@@ -328,6 +320,29 @@ def handle_sensor_history(environ, start_response):
     start_response("200 OK", [("Content-Type", "application/json")])
     return [content]
 
+def handle_delete_session(environ, start_response):
+    """Deletes a session and cascades to delete all sensor_data points."""
+    if environ.get('REQUEST_METHOD') == 'POST':
+        try:
+            length = int(environ.get('CONTENT_LENGTH', 0))
+            post_data = parse_qs(environ['wsgi.input'].read(length).decode('utf-8'))
+            session_id = post_data.get('session_id', [None])[0]
+
+            if session_id:
+                conn = get_db()
+                conn.execute("DELETE FROM sensor_data WHERE session_id = ?", (session_id,))
+                conn.execute("DELETE FROM sessions WHERE id = ?", (session_id,))
+                conn.commit()
+                conn.close()
+
+            start_response("303 See Other", [("Location", "/sessions")])
+            return [b""]
+        except Exception as e:
+            print(f"Delete Error: {e}")
+            
+    start_response("303 See Other", [("Location", "/sessions")])
+    return [b""]
+
 # --- MAIN WSGI APP ---
 
 def application(environ, start_response):
@@ -352,6 +367,8 @@ def application(environ, start_response):
         return handle_sensor_history(environ, start_response)
     elif path == "/sessions":
         return handle_sessions(environ, start_response)
+    elif path == "/delete_session":
+        return handle_delete_session(environ, start_response)
     
     # Static File Server
     elif path.startswith("/static/"):
