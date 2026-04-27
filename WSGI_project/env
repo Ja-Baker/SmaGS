@@ -1,0 +1,3 @@
+# .env
+SECRET_KEY=smags
+DB_PATH=smags.db

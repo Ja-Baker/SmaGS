@@ -99,7 +99,7 @@
             <div class="theme-picker">
                 <form action="/set_theme" method="POST" id="theme-form">
                     <label for="theme-select">Interface:</label>
-                    <select name="theme" id="theme-select" onchange="changeTheme(this)">
+                    <select name="theme" id="theme-select" onchange="this.form.submit()">
                         {% for t in themes %}
                             <option value="{{ t }}" {% if theme == t %}selected{% endif %}>
                                 {{ t.replace('_', ' ').title() }}

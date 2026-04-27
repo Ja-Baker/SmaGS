@@ -99,6 +99,7 @@ def handle_set_theme(environ, start_response):
         content_length = int(environ.get('CONTENT_LENGTH', 0))
         post_data = environ['wsgi.input'].read(content_length).decode('utf-8')
         params = parse_qs(post_data)
+        
         new_theme = params.get('theme', ['green'])[0]
         
         consented = get_cookie(environ, 'cookie_consent', 'false') == 'true'
