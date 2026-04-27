@@ -2,6 +2,7 @@ import os
 import json
 import sqlite3
 import pytz
+import urllib.parse
 from datetime import datetime
 from urllib.parse import parse_qs
 from jinja2 import Environment, FileSystemLoader
@@ -51,6 +52,20 @@ def get_cookie(environ, key, default='false'):
             cookies[k.strip()] = v.strip()
     return cookies.get(key, default)
 
+def get_device_visibility(environ, sensor_id):
+    """Helper to extract metric preferences from the user's cookie."""
+    cookie_str = environ.get('HTTP_COOKIE', '')
+    if 'device_visibility=' in cookie_str:
+        try:
+            # Extract and parse the JSON from the cookie
+            raw_cookie = cookie_str.split('device_visibility=')[1].split(';')[0]
+            import urllib.parse
+            data = json.loads(urllib.parse.unquote(raw_cookie))
+            return data.get(sensor_id, ALL_METRICS) # Fallback to all if not set
+        except:
+            pass
+    return ALL_METRICS
+
 # --- ROUTE HANDLERS ---
 
 def handle_favicon(environ, start_response):
@@ -65,31 +80,43 @@ def handle_favicon(environ, start_response):
         start_response('404 Not Found', [('Content-Type', 'text/plain')])
         return [b"Favicon not found"]
 
+
 def handle_index(environ, start_response):
-    """Main Dashboard Route."""
+    """Main Dashboard Route - Hybrid Server/Cookie Logic."""
     consented = get_cookie(environ, 'cookie_consent', 'false') == 'true'
     theme = get_cookie(environ, 'theme', 'green') if consented else 'green'
-    
-    themes_list = get_available_themes()
-    
-    conn = get_db()
-    latest_data = conn.execute("SELECT * FROM sensor_data ORDER BY timestamp DESC LIMIT 20").fetchall()
-    
-    devices_raw = conn.execute("SELECT sensor_id, name FROM devices").fetchall()
-    device_map = {
-        d['sensor_id']: {
-            "name": d['name'], 
-            "visible_metrics": []
-        } for d in devices_raw
-    }
-    conn.close()
 
+    visibility_prefs = {}
+    cookie_str = environ.get('HTTP_COOKIE', '')
+    if 'device_visibility=' in cookie_str:
+        try:
+            raw_cookie = cookie_str.split('device_visibility=')[1].split(';')[0]
+            visibility_prefs = json.loads(urllib.parse.unquote(raw_cookie))
+        except Exception as e:
+            print(f"Cookie Parse Error: {e}")
+    conn = get_db()
+    latest_data = conn.execute("""
+        SELECT s.*, d.name 
+        FROM sensor_data s
+        LEFT JOIN devices d ON s.sensor_id = d.sensor_id
+        ORDER BY s.timestamp DESC LIMIT 20
+    """).fetchall()
+    devices_raw = conn.execute("SELECT sensor_id, name FROM devices").fetchall()
+    conn.close()
+    device_map = {}
+    for d in devices_raw:
+        s_id = d['sensor_id']
+        user_visible = visibility_prefs.get(s_id, ALL_METRICS)
+        device_map[s_id] = {
+            "name": d['name'], 
+            "visible_metrics": user_visible
+        }
     template = env.get_template("index.html")
     content = template.render(
         latest=latest_data, 
         device_map=device_map, 
         theme=theme,
-        themes=themes_list,
+        themes=get_available_themes(),
         all_metrics=ALL_METRICS,
         consented=consented
     ).encode("utf-8")
@@ -215,6 +242,29 @@ def handle_api_data(environ, start_response):
         print(f"API Error: {e}")
         start_response("400 Bad Request", [("Content-Type", "text/plain")])
         return [str(e).encode("utf-8")]
+    
+
+def handle_update_device(environ, start_response):
+    if environ.get('REQUEST_METHOD') == 'POST':
+        try:
+            request_body_size = int(environ.get('CONTENT_LENGTH', 0))
+            request_body = environ['wsgi.input'].read(request_body_size).decode('utf-8')
+            params = parse_qs(request_body)
+            sensor_id = params.get('sensor_id', [None])[0]
+            new_name = params.get('name', ['Unnamed Sensor'])[0]
+            if sensor_id:
+                conn = get_db()
+                conn.execute("UPDATE devices SET name = ? WHERE sensor_id = ?", (new_name, sensor_id))
+                conn.commit()
+                conn.close()
+            start_response("303 See Other", [("Location", "/devices")])
+            return [b""]
+        except Exception as e:
+            start_response("500 Internal Server Error", [("Content-Type", "text/plain")])
+            return [str(e).encode('utf-8')]
+            
+    start_response("405 Method Not Allowed", [])
+    return [b"Method Not Allowed"]
 
 # --- MAIN WSGI APP ---
 
@@ -234,6 +284,8 @@ def application(environ, start_response):
         return handle_api_data(environ, start_response)
     elif path == "/devices":
         return handle_devices(environ, start_response)
+    elif path == "/update_device":
+        return handle_update_device(environ, start_response)
     
     # Static File Server
     elif path.startswith("/static/"):

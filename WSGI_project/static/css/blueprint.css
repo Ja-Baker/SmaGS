@@ -1,0 +1,169 @@
+/* SmaGS - Professional Blueprint Theme (Light Mode v2)
+   Clean, architectural drafting aesthetic with optimized spacing.
+*/
+
+:root {
+    --bg-color: #faf8f5;         /* Warm Paper White */
+    --text-color: #1a1a1a;       /* Charcoal Ink */
+    --accent-primary: #2d5a27;   /* Deep Forest Green */
+    --accent-secondary: #4a7c44;
+    --accent-muted: #888888;
+    --card-bg: #ffffff;
+    --border-color: #d1d1d1;
+    --header-gradient: linear-gradient(135deg, #2d5a27, #1e3d1a);
+    --hover-bg: rgba(45, 90, 39, 0.05);
+    
+    /* Technical Metric Colors */
+    --moisture: #0056b3;
+    --temp: #c62828;
+    --humidity: #00695c;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, system-ui, sans-serif;
+    background-color: var(--bg-color);
+    background-image: radial-gradient(#d1d1d1 0.5px, transparent 0.5px);
+    background-size: 24px 24px;
+    color: var(--text-color);
+    line-height: 1.5;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+/* --- Dashboard Grid Layout (Mirroring Green/Midnight) --- */
+.device-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px; /* Consistent spacing */
+    margin-top: 20px;
+}
+
+.device-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-top: 4px solid var(--accent-primary); /* Bold header line */
+    padding: 24px;
+    border-radius: 0; 
+    box-shadow: 6px 6px 0px rgba(0,0,0,0.03);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.device-card:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 8px 8px 0px rgba(45, 90, 39, 0.1);
+    border-color: var(--accent-primary);
+}
+
+.device-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.device-name {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--accent-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* --- Metrics Display --- */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.metric {
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    background: #fbfbfb;
+    border: 1px solid #f0f0f0;
+}
+
+.metric .label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    color: var(--accent-muted);
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.metric .value {
+    font-size: 1.2rem;
+    font-weight: 800;
+    font-family: 'JetBrains Mono', monospace; /* Technical feel */
+}
+
+/* Individual Metric Colors for Clarity */
+.metric.moisture .value { color: var(--moisture); }
+.metric.soiltemp .value { color: var(--temp); }
+.metric.humidity .value { color: var(--humidity); }
+.metric.airtemp .value { color: var(--accent-secondary); }
+
+/* --- Table Styling --- */
+.table-container {
+    margin-top: 40px;
+    background: white;
+    border: 1px solid var(--border-color);
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: #f1f1f1;
+    text-align: left;
+    padding: 12px 16px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: var(--accent-primary);
+    border-bottom: 2px solid var(--accent-primary);
+}
+
+td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 0.9rem;
+}
+
+/* --- Controls & Toggles --- */
+.save-btn {
+    background: var(--accent-primary) !important;
+    color: white !important;
+    border: none;
+    padding: 12px 24px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.save-btn:hover {
+    opacity: 0.9;
+}
+
+input[type="text"] {
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    font-family: inherit;
+}

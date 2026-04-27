@@ -1,0 +1,64 @@
+/* SmaGS - Raw HTML Theme
+   Total Reset: Reverting to 1993 Browser Defaults.
+*/
+
+:root {
+    /* These are just placeholders to prevent errors, 
+       but we won't use them for layout. */
+    --bg-color: #ffffff;
+    --text-color: #000000;
+}
+
+body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-family: serif !important; /* Times New Roman vibe */
+    padding: 20px !important;
+    line-height: normal !important;
+}
+
+/* Strip all custom layout containers */
+.container, .device-list, .metrics-grid, .device-card {
+    display: block !important;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 10px 0 !important;
+    width: auto !important;
+    transform: none !important;
+}
+
+/* Make links look like the classic blue/purple defaults */
+a {
+    color: #0000ee !important;
+    text-decoration: underline !important;
+}
+
+a:visited {
+    color: #551a8b !important;
+}
+
+/* Force standard buttons and inputs */
+button, input {
+    appearance: auto !important;
+    background: initial !important;
+    border: 2px outset #ccc !important;
+    color: initial !important;
+    font-family: serif !important;
+    padding: 1px 6px !important;
+}
+
+/* Labels should just be plain text */
+label {
+    display: block;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+/* Add a horizontal rule look between devices */
+.device-card {
+    border-bottom: 1px solid #000 !important;
+    padding-bottom: 20px !important;
+    margin-bottom: 20px !important;
+}

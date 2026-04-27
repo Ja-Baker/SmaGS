@@ -1,0 +1,66 @@
+/* SmaGS - Pixel Farm Theme
+   A cozy 8-bit aesthetic inspired by farming sims.
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+:root {
+    --bg-color: #6fb33e;         /* Grass Green */
+    --text-color: #3e2731;       /* Dark Earth */
+    --accent-primary: #f0a02d;   /* Carrot Orange */
+    --accent-secondary: #ffecb3; /* Pale Straw */
+    --card-bg: #8d5524;          /* Wood Brown */
+    --border-color: #3e2731;
+}
+
+body {
+    font-family: 'Press Start 2P', cursive;
+    background-color: var(--bg-color);
+    /* Subtle pixel grid background */
+    background-image: linear-gradient(rgba(0,0,0,0.05) 2px, transparent 2px),
+                      linear-gradient(90deg, rgba(0,0,0,0.05) 2px, transparent 2px);
+    background-size: 4px 4px;
+    color: var(--text-color);
+    font-size: 10px;
+    line-height: 2;
+}
+
+.topbar {
+    background: #4a2e15;
+    border-bottom: 4px solid #3e2731;
+    image-rendering: pixelated;
+}
+
+.device-card {
+    background: var(--card-bg);
+    border: 4px solid #3e2731;
+    color: #fff;
+    padding: 20px;
+    box-shadow: 8px 8px 0px rgba(0,0,0,0.2);
+    /* Pixelated "Wood Plank" effect */
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 18px, rgba(0,0,0,0.1) 20px);
+}
+
+.device-name {
+    color: var(--accent-primary);
+    margin-bottom: 15px;
+}
+
+.metric {
+    background: rgba(0,0,0,0.3);
+    border: 2px solid #3e2731;
+    margin: 5px 0;
+}
+
+.save-btn {
+    background: #e74c3c !important; /* Tool red */
+    color: white !important;
+    border: 4px solid #c0392b !important;
+    font-family: 'Press Start 2P', cursive;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.save-btn:hover {
+    background: #ff7675 !important;
+}

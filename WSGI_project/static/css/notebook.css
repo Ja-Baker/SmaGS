@@ -1,0 +1,134 @@
+/* SmaGS - Student Notebook Theme
+   Loose-leaf paper background with Sticky Note device cards.
+*/
+
+:root {
+    --bg-color: #fdfdfd;
+    --text-color: #2c3e50;
+    --accent-primary: #3498db; /* Blue pen color */
+    --accent-secondary: #e74c3c; /* Red margin color */
+    --accent-muted: #95a5a6;
+    --card-bg: #fff9c4; /* Classic Yellow Sticky Note */
+    --border-color: #dcdde1;
+    --header-gradient: linear-gradient(135deg, #3498db, #2980b9);
+    --hover-bg: rgba(52, 152, 219, 0.05);
+    
+    /* Marker/Pen Colors for Metrics */
+    --moisture: #0984e3;
+    --temp: #d63031;
+    --humidity: #00b894;
+}
+
+body {
+    font-family: 'Comic Sans MS', 'cursive', sans-serif; /* Best for 'handwritten' feel */
+    background-color: var(--bg-color);
+    /* Create the loose-leaf paper lines */
+    background-image: 
+        linear-gradient(90deg, transparent 79px, var(--accent-secondary) 79px, var(--accent-secondary) 81px, transparent 81px),
+        linear-gradient(#eee .1em, transparent .1em);
+    background-size: 100% 1.5em;
+    padding-left: 80px; /* Space for the red margin line */
+}
+
+.topbar {
+    background: var(--header-gradient);
+    border-bottom: 3px solid #2980b9;
+    padding: 10px 20px;
+    margin-left: -80px; /* Align to edge */
+}
+
+.topbar h1 {
+    font-family: 'Segoe UI', sans-serif;
+    color: white;
+}
+
+/* --- The Sticky Note Cards --- */
+.device-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    padding: 40px 20px;
+}
+
+.device-card {
+    background: var(--card-bg);
+    width: 300px;
+    min-height: 300px;
+    padding: 25px;
+    box-shadow: 5px 5px 10px rgba(0,0,0,0.1);
+    border: none;
+    position: relative;
+    /* Slight rotation for the "tossed on the desk" look */
+    transform: rotate(-1deg);
+    transition: transform 0.2s ease;
+}
+
+/* Alternate rotation for every second sticky note */
+.device-card:nth-child(even) {
+    transform: rotate(2deg);
+    background: #ffecb3; /* Slightly different yellow */
+}
+
+/* Pink sticky note for every third */
+.device-card:nth-child(3n) {
+    transform: rotate(-1.5deg);
+    background: #f8bbd0;
+}
+
+.device-card:hover {
+    transform: scale(1.05) rotate(0deg);
+    box-shadow: 10px 10px 20px rgba(0,0,0,0.15);
+    z-index: 10;
+}
+
+/* The "Tape" at the top of the sticky note */
+.device-card::before {
+    content: "";
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 30px;
+    background: rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.device-name {
+    font-size: 1.4rem;
+    color: #2c3e50;
+    text-decoration: underline wavy var(--accent-primary);
+    margin-bottom: 15px;
+}
+
+.metric {
+    background: transparent;
+    border-bottom: 1px dashed #ccc;
+    margin-bottom: 10px;
+    padding: 5px 0;
+}
+
+.metric .label {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.metric .value {
+    font-size: 1.3rem;
+    font-weight: bold;
+}
+
+/* --- Form Controls --- */
+input[type="text"] {
+    background: rgba(255,255,255,0.5) !important;
+    border: none !important;
+    border-bottom: 2px solid var(--accent-primary) !important;
+    font-family: inherit;
+}
+
+.save-btn {
+    background: var(--accent-primary) !important;
+    color: white !important;
+    border-radius: 4px !important;
+    font-family: inherit;
+}
