@@ -160,6 +160,38 @@ def handle_devices(environ, start_response):
     start_response("200 OK", [("Content-Type", "text/html")])
     return [content]
 
+def handle_sessions(environ, start_response):
+    consented = get_cookie(environ, 'cookie_consent', 'false') == 'true'
+    theme = get_cookie(environ, 'theme', 'green') if consented else 'green'
+
+    conn = get_db()
+    device_rows = conn.execute("SELECT * FROM devices").fetchall()
+    conn.close()
+    
+    device_list = []
+    for row in device_rows:
+        d = dict(row)
+        raw_metrics = d.get('visible_metrics')
+        if raw_metrics:
+            try:
+                d['visible_metrics'] = json.loads(raw_metrics)
+            except:
+                d['visible_metrics'] = ALL_METRICS
+        else:
+            d['visible_metrics'] = ALL_METRICS
+            
+        device_list.append(d)
+
+    template = env.get_template('sessions.html')
+    content = template.render(
+        devices=device_list, 
+        theme=theme, 
+        consented=consented
+    ).encode("utf-8")
+
+    start_response("200 OK", [("Content-Type", "text/html")])
+    return [content]
+
 def handle_set_theme(environ, start_response):
     """Handles theme updates via 303 Redirect."""
     try:
@@ -318,6 +350,8 @@ def application(environ, start_response):
         return handle_update_device(environ, start_response)
     elif path == "/api/history/":
         return handle_sensor_history(environ, start_response)
+    elif path == "/sessions":
+        return handle_sessions(environ, start_response)
     
     # Static File Server
     elif path.startswith("/static/"):
