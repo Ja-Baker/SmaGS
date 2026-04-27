@@ -1,0 +1,127 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+:root {
+    --bg-color: #f8f8f8;         
+    --text-color: #303030;      
+    --accent-primary: #a040a0;   
+    --accent-secondary: #ff8c00;  
+    --card-bg: #ffffff;
+    --border-color: #101010;      
+    
+    /* Vibe colors */
+    --exp-bar: #3ae716;         
+}
+
+body {
+    font-family: 'Press Start 2P', cursive;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-size: 10px;
+    line-height: 2;
+    image-rendering: pixelated; 
+}
+
+.topbar {
+    background: #e74c3c; 
+    border-bottom: 4px solid var(--border-color);
+    box-shadow: inset 0 -10px 0 rgba(0,0,0,0.1);
+}
+
+.topbar h1 span {
+    color: #fff;
+    text-shadow: 2px 2px 0 #000;
+}
+
+.device-card {
+    background: var(--card-bg);
+    border: 4px solid var(--border-color);
+    border-radius: 12px; 
+    padding: 20px;
+    position: relative;
+    box-shadow: 8px 8px 0px rgba(0,0,0,0.1);
+}
+
+.device-card::after {
+    content: '▼';
+    position: absolute;
+    bottom: 10px;
+    right: 15px;
+    font-size: 14px;
+    color: var(--border-color);
+    animation: blink 0.8s infinite;
+}
+
+@keyframes blink { 50% { opacity: 0; } }
+
+.device-header {
+    border-bottom: 2px dashed #ccc;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+}
+
+.device-name {
+    color: var(--accent-primary);
+    text-transform: uppercase; 
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: 1fr; 
+    gap: 15px;
+}
+
+.metric {
+    position: relative;
+    padding-left: 45px; 
+    margin-bottom: 5px;
+}
+
+/* Define icons using high-quality fan sprites or emojis */
+.metric.moisture::before { content: '💧'; position: absolute; left: 0; font-size: 24px; }
+.metric.soiltemp::before { content: '🪨'; position: absolute; left: 0; font-size: 24px; } 
+.metric.humidity::before { content: '🌫️'; position: absolute; left: 0; font-size: 24px; } 
+.metric.airtemp::before { content: '🔥'; position: absolute; left: 0; font-size: 24px; }
+
+.metric .label {
+    text-transform: uppercase;
+    font-size: 8px;
+    color: var(--accent-primary);
+}
+
+.metric .value {
+    display: block;
+    font-size: 16px;
+    color: var(--text-color);
+    margin-top: 5px;
+}
+
+.metric.moisture::after {
+    content: '';
+    display: block;
+    height: 8px;
+    background: #ccc;
+    border: 2px solid #000;
+    margin-top: 5px;
+    position: relative;
+    width: 100%;
+}
+
+.save-btn {
+    font-family: 'Press Start 2P', cursive;
+    background: #e74c3c !important; 
+    color: white !important;
+    border: 4px solid var(--border-color) !important;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+
+.save-btn:hover {
+    background: var(--exp-bar) !important;
+}
+
+.theme-picker select {
+    font-family: 'Press Start 2P', cursive;
+    border: 2px solid var(--border-color);
+    background: #fff;
+    color: #000;
+}
