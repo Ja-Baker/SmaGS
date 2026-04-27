@@ -93,6 +93,32 @@ def handle_index(environ, start_response):
     start_response("200 OK", [("Content-Type", "text/html")])
     return [content]
 
+def handle_devices(environ, start_response):
+    """Renders the device management page."""
+    consented = get_cookie(environ, 'cookie_consent', 'false') == 'true'
+    theme = get_cookie(environ, 'theme', 'green') if consented else 'green'
+
+    conn = get_db()
+    device_rows = conn.execute('SELECT mac_address, name, visible_metrics FROM devices').fetchall()
+    conn.close()
+    
+    device_map = {}
+    for row in device_rows:
+        device_map[row['mac_address']] = {
+            "name": row['name'],
+            "visible_metrics": json.loads(row['visible_metrics'])
+        }
+
+    template = env.get_template('devices.html')
+    output = template.render(
+        device_map=device_map,
+        theme=theme,
+        consented=consented
+    ).encode('utf-8')
+
+    start_response("200 OK", [("Content-Type", "text/html")])
+    return [output]
+
 def handle_set_theme(environ, start_response):
     """Handles theme updates via 303 Redirect."""
     try:
@@ -172,6 +198,8 @@ def application(environ, start_response):
         return handle_accept_cookies(environ, start_response)
     elif path == "/api/data":
         return handle_api_data(environ, start_response)
+    elif path == "/devices":
+        return handle_devices(environ, start_response)
     
     # Static File Server
     elif path.startswith("/static/"):

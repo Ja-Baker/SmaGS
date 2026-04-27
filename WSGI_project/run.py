@@ -4,7 +4,7 @@ import os
 
 def start_dev_server():
     host = "127.0.0.1"
-    port = 5001
+    port = 8080
     
     print("-" * 30)
     print(" SmaGS DEVELOPMENT SERVER ")
