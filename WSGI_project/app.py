@@ -8,6 +8,9 @@ from urllib.parse import parse_qs
 from jinja2 import Environment, FileSystemLoader
 from dotenv import load_dotenv
 
+from weather import get_forecast
+from advisor import recommend
+
 # --- CONFIGURATION ---
 load_dotenv()
 
@@ -95,7 +98,7 @@ def handle_index(environ, start_response):
             print(f"Cookie Parse Error: {e}")
     conn = get_db()
     latest_data = conn.execute("""
-        SELECT s.*, d.name 
+        SELECT s.*, d.name
         FROM sensor_data s
         LEFT JOIN devices d ON s.sensor_id = d.sensor_id
         ORDER BY s.timestamp DESC LIMIT 20
@@ -106,23 +109,42 @@ def handle_index(environ, start_response):
     for d in devices_raw:
         s_id = d['sensor_id']
         sensor_config = visibility_prefs.get(s_id, {})
-        
+
         user_visible = sensor_config.get("metrics", ALL_METRICS)
-        user_unit = sensor_config.get("unit", "C") 
+        user_unit = sensor_config.get("unit", "C")
 
         device_map[s_id] = {
-            "name": d['name'], 
+            "name": d['name'],
             "visible_metrics": user_visible,
             "unit": user_unit
         }
+
+    forecast = get_forecast()
+    recommendations = {}
+    seen_for_rec = set()
+    for row in latest_data:
+        sid = row['sensor_id']
+        if sid in seen_for_rec:
+            continue
+        seen_for_rec.add(sid)
+        reading = {
+            'soil_moisture': row['soil_moisture'],
+            'soil_temp': row['soil_temp'],
+            'air_temp': row['air_temp'],
+            'air_humidity': row['air_humidity'],
+        }
+        recommendations[sid] = recommend(reading, forecast)
+
     template = env.get_template("index.html")
     content = template.render(
-        latest=latest_data, 
-        device_map=device_map, 
+        latest=latest_data,
+        device_map=device_map,
         theme=theme,
         themes=get_available_themes(),
         all_metrics=ALL_METRICS,
-        consented=consented
+        consented=consented,
+        forecast=forecast,
+        recommendations=recommendations
     ).encode("utf-8")
 
     start_response("200 OK", [("Content-Type", "text/html")])
