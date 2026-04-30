@@ -7,12 +7,8 @@ import advisor
 from datetime import datetime
 from urllib.parse import parse_qs
 from jinja2 import Environment, FileSystemLoader
-from dotenv import load_dotenv
 from weather import get_forecast
 from advisor import recommend
-
-# --- CONFIGURATION ---
-load_dotenv()
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, os.getenv("DB_PATH", "smags.db"))
