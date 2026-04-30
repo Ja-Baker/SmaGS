@@ -1,0 +1,69 @@
+:root {
+    --bg-color: #fcfcfc;
+    --text-color: #1a1a1a;
+    --accent-primary: #000000;
+    --accent-secondary: #4d4d4d;
+    --accent-muted: #808080;
+    --border-color: #000000;
+    --hover-bg: #eeeeee;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Libre Baskerville', serif; 
+    line-height: 1.6;
+}
+
+.topbar {
+    border-bottom: 4px solid #000;
+    padding-bottom: 10px;
+}
+
+.topbar h1 {
+    font-weight: 900;
+}
+
+.device-card, .weather-card {
+    background: #fff;
+    border: 2px solid #000;
+    box-shadow: none; 
+    border-radius: 0; 
+    padding: 20px;
+}
+
+.metric .value {
+    font-size: 24px;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.nav-link {
+    color: #000;
+    text-decoration: none;
+    border: 1px solid #000;
+    padding: 4px 10px;
+    font-size: 14px;
+}
+
+.nav-link:hover {
+    background: #000;
+    color: #fff;
+}
+
+table {
+    width: 100%;
+    border-top: 2px solid #000;
+}
+
+th {
+    border-bottom: 1px solid #000;
+    text-transform: uppercase;
+    font-size: 12px;
+}
+
+.info-box {
+    background-image: radial-gradient(#ccc 1px, transparent 0);
+    background-size: 4px 4px;
+    background-color: #fff !important;
+}

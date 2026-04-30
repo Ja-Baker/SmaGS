@@ -22,7 +22,6 @@ LOCAL_TZ = pytz.timezone('America/Chicago')
 
 ALL_METRICS = ["soil_moisture", "soil_temp", "air_humidity", "air_temp"]
 
-# Setup Jinja2
 jinja_env = Environment(loader=FileSystemLoader(TEMPLATE_DIR))
 env = Environment(loader=FileSystemLoader(TEMPLATE_DIR))
 
@@ -59,11 +58,10 @@ def get_device_visibility(environ, sensor_id):
     cookie_str = environ.get('HTTP_COOKIE', '')
     if 'device_visibility=' in cookie_str:
         try:
-            # Extract and parse the JSON from the cookie
             raw_cookie = cookie_str.split('device_visibility=')[1].split(';')[0]
             import urllib.parse
             data = json.loads(urllib.parse.unquote(raw_cookie))
-            return data.get(sensor_id, ALL_METRICS) # Fallback to all if not set
+            return data.get(sensor_id, ALL_METRICS) 
         except:
             pass
     return ALL_METRICS
@@ -73,7 +71,6 @@ def get_device_visibility(environ, sensor_id):
 def handle_favicon(environ, start_response):
     """Serves the SmaGS logo/favicon to the browser."""
     try:
-        # Serves the icon from the root /app folder in your container
         with open(os.path.join(BASE_DIR, 'favicon.ico'), 'rb') as f:
             data = f.read()
         start_response('200 OK', [('Content-Type', 'image/x-icon')])
