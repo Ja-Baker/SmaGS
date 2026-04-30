@@ -182,6 +182,30 @@ def handle_devices(environ, start_response):
     start_response("200 OK", [("Content-Type", "text/html")])
     return [content]
 
+def handle_sessions(environ, start_response):
+    """Lists all monitoring sessions with summary stats."""
+    conn = get_db()
+    sessions = conn.execute("""
+        SELECT s.*, 
+               (SELECT COUNT(*) FROM sensor_data WHERE session_id = s.id) as reading_count,
+               (SELECT MIN(timestamp) FROM sensor_data WHERE session_id = s.id) as start_time,
+               (SELECT MAX(timestamp) FROM sensor_data WHERE session_id = s.id) as end_time
+        FROM sessions s
+        ORDER BY s.id DESC
+    """).fetchall()
+    current_session_id = sessions[0]['id'] if sessions else None
+    conn.close()
+
+    template = env.get_template("sessions.html")
+    content = template.render(
+        sessions=sessions,
+        current_session_id=current_session_id,
+        theme=get_cookie(environ, 'theme', 'green')
+    ).encode("utf-8")
+
+    start_response("200 OK", [("Content-Type", "text/html")])
+    return [content]
+
 def handle_set_theme(environ, start_response):
     """Handles theme updates via 303 Redirect."""
     try:
@@ -297,6 +321,50 @@ def handle_update_device(environ, start_response):
     start_response("405 Method Not Allowed", [("Content-Type", "text/plain")])
     return [b"Method Not Allowed"]
 
+def handle_sensor_history(environ, start_response):
+    """API Endpoint for Chart.js historical data."""
+    path = environ.get('PATH_INFO', '')
+    sensor_id = path.split('/')[-1]
+    params = parse_qs(environ.get('QUERY_STRING', ''))
+    hours = int(params.get('hours', [24])[0])
+    
+    conn = get_db()
+    query = """
+        SELECT timestamp, soil_moisture, soil_temp, air_humidity, air_temp 
+        FROM sensor_data 
+        WHERE sensor_id = ? AND timestamp >= datetime('now', ?) 
+        ORDER BY timestamp ASC
+    """
+    history = conn.execute(query, (sensor_id, f'-{hours} hours')).fetchall()
+    conn.close()
+
+    content = json.dumps([dict(row) for row in history]).encode('utf-8')
+    start_response("200 OK", [("Content-Type", "application/json")])
+    return [content]
+
+def handle_delete_session(environ, start_response):
+    """Deletes a session and cascades to delete all sensor_data points."""
+    if environ.get('REQUEST_METHOD') == 'POST':
+        try:
+            length = int(environ.get('CONTENT_LENGTH', 0))
+            post_data = parse_qs(environ['wsgi.input'].read(length).decode('utf-8'))
+            session_id = post_data.get('session_id', [None])[0]
+
+            if session_id:
+                conn = get_db()
+                conn.execute("DELETE FROM sensor_data WHERE session_id = ?", (session_id,))
+                conn.execute("DELETE FROM sessions WHERE id = ?", (session_id,))
+                conn.commit()
+                conn.close()
+
+            start_response("303 See Other", [("Location", "/sessions")])
+            return [b""]
+        except Exception as e:
+            print(f"Delete Error: {e}")
+            
+    start_response("303 See Other", [("Location", "/sessions")])
+    return [b""]
+
 # --- MAIN WSGI APP ---
 
 def application(environ, start_response):
@@ -317,6 +385,12 @@ def application(environ, start_response):
         return handle_devices(environ, start_response)
     elif path == "/update_device":
         return handle_update_device(environ, start_response)
+    elif path == "/api/history/":
+        return handle_sensor_history(environ, start_response)
+    elif path == "/sessions":
+        return handle_sessions(environ, start_response)
+    elif path == "/delete_session":
+        return handle_delete_session(environ, start_response)
     
     # Static File Server
     elif path.startswith("/static/"):

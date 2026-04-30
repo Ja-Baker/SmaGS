@@ -5,59 +5,128 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SmaGS - Sessions</title>
     <link rel="stylesheet" href="/static/css/{{ theme }}.css">
-  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <style>
+        /* Extra styling for the interactive elements in Sessions */
+        .session-card {
+            position: relative;
+            display: block;
+            text-decoration: none;
+            transition: transform 0.2s;
+            margin-bottom: 15px;
+        }
+
+        .session-link-overlay {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .delete-form {
+            position: absolute;
+            right: 20px;
+            bottom: 20px;
+            z-index: 10;
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+            border: 2px solid #101010;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 12px;
+            border-radius: 4px;
+        }
+
+        .delete-btn:hover {
+            background: #c0392b;
+            transform: scale(1.1);
+        }
+
+        .active-badge {
+            background: var(--exp-bar, #2ecc71);
+            color: #000;
+            padding: 2px 6px;
+            font-size: 10px;
+            margin-left: 10px;
+            border: 1px solid #000;
+        }
+    </style>
 </head>
 <body>
     <div class="topbar">
         <div class="logo-area">
-            <h1>&#127793; Sma<span>GS</span> Sessions</h1>
+            <h1>🌱 Sma<span>GS</span> Sessions</h1>
         </div>
         <div class="topbar-right">
-            <a href="/" class="nav-link">&#8592; Back to Dashboard</a>
+            <a href="/" class="nav-link">← Dashboard</a>
         </div>
     </div>
 
     <div class="container">
         <div class="section-header">
-            <h2>Historical Monitoring Sessions</h2>
-            <p class="section-subtitle">Select a session below to view detailed sensor logs from that period.</p>
+            <h2 style="color: var(--accent-primary);">Monitoring History</h2>
+            <p class="section-subtitle">Click a session to view detailed logs or use the trash icon to remove old data.</p>
         </div>
 
         {% if sessions %}
         <div class="session-list">
             {% for s in sessions %}
-            <a href="/sessions/{{ s.id }}" class="session-card {% if s.id == current_session_id %}active{% endif %}">
-                
-                <div class="session-item-content">
-                    <div class="session-info">
-                        <div class="session-title">
-                            Session #{{ s.id }} &mdash; {{ s.start_time[:10] }}
-                            {% if s.id == current_session_id %}
-                                <span class="active-badge">Live</span>
-                            {% endif %}
+            <div class="device-card session-card">
+                <a href="/api/history/all?session_id={{ s.id }}" class="session-link-overlay">
+                    <div class="session-item-content">
+                        <div class="session-info">
+                            <div class="device-name" style="font-size: 14px; margin-bottom: 8px;">
+                                Session #{{ s.id }} 
+                                {% if s.id == current_session_id %}
+                                    <span class="active-badge">LIVE</span>
+                                {% endif %}
+                            </div>
+                            <div class="session-time" style="font-size: 10px; opacity: 0.8;">
+                                <strong>Start:</strong> {{ s.start_time }}<br>
+                                {% if s.end_time %}
+                                    <strong>End:</strong> {{ s.end_time }}
+                                {% else %}
+                                    <strong>Status:</strong> Recording...
+                                {% endif %}
+                            </div>
                         </div>
-                        <div class="session-time">
-                            <strong>Started:</strong> {{ s.start_time }}
-                            {% if s.end_time %}
-                             &middot; <strong>Ended:</strong> {{ s.end_time }}
-                            {% endif %}
-                        </div>
-                    </div>
 
-                    <div class="session-meta">
-                        <div class="reading-count">{{ s.reading_count }}</div>
-                        <div class="meta-label">Readings</div>
+                        <div class="session-meta" style="margin-top: 15px; border-top: 1px dashed #ccc; padding-top: 10px;">
+                            <span style="color: var(--accent-primary);">READINGS:</span> 
+                            <span class="reading-count">{{ s.reading_count }}</span>
+                        </div>
                     </div>
-                </div>
-            </a>
+                </a>
+
+                <form action="/delete_session" method="POST" class="delete-form" 
+                      onsubmit="return confirm('WARNING: This will permanently delete Session #{{ s.id }} and all associated sensor data. Proceed?');">
+                    <input type="hidden" name="session_id" value="{{ s.id }}">
+                    <button type="submit" class="delete-btn" title="Delete Session">
+                        🗑️ DELETE
+                    </button>
+                </form>
+            </div>
             {% endfor %}
         </div>
         {% else %}
-        <div class="no-data-placeholder">
-            <p>No monitoring sessions found in the database.</p>
-            <p class="sub-text">Data will appear here once the first ESP32 packet is received.</p>
+        <div class="device-card" style="text-align: center; padding: 40px;">
+            <p>No monitoring sessions found.</p>
+            <p style="font-size: 10px; margin-top: 10px;">Data will appear here once your sensors begin transmitting.</p>
         </div>
         {% endif %}
     </div>
+
+    <script>
+        // Optional: Add a small animation for the 'Live' badge
+        setInterval(() => {
+            const badges = document.querySelectorAll('.active-badge');
+            badges.forEach(b => {
+                b.style.opacity = b.style.opacity === '0.5' ? '1' : '0.5';
+            });
+        }, 800);
+    </script>
 </body>
 </html>
