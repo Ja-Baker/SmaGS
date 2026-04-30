@@ -52,6 +52,7 @@ body {
     position: relative;
     transform: rotate(-1deg);
     transition: transform 0.2s ease;
+    flex: 0 1 300px;
 }
 
 .device-card:nth-child(even) {
@@ -118,4 +119,16 @@ input[type="text"] {
     color: white !important;
     border-radius: 4px !important;
     font-family: inherit;
+}
+
+.card-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    padding: 20px 0;
+    align-items: flex-start;
+}
+
+.card-grid {
+    justify-content: flex-start;
 }
