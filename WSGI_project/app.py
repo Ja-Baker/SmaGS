@@ -141,7 +141,7 @@ def handle_index(environ, start_response):
         theme=theme,
         themes=get_available_themes(),
         all_metrics=ALL_METRICS,
-        consented=consented
+        consented=consented,
         forecast=forecast,
         recomendations=recomendations
     ).encode("utf-8")
