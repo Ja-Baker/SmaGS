@@ -61,15 +61,18 @@
             font-weight: bold;
         }
 
-        /* Styling for the new Dynamic Plant Badge */
         .plant-badge {
-            font-size: 0.7rem;
-            background: rgba(46, 204, 113, 0.2);
+            font-size: 0.75rem;
+            background: rgba(46, 204, 113, 0.15);
             color: var(--accent-primary);
-            padding: 2px 8px;
-            border-radius: 4px;
-            margin-left: 10px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            margin-left: 12px;
             border: 1px solid var(--accent-primary);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -162,8 +165,17 @@
                             <div class="device-card">
                                 <div class="device-header">
                                     <span class="device-name">{{ device.name }}</span>
-                                    <!-- Dynamic Crop Badge[cite: 12] -->
-                                    <span class="plant-badge">🌱 {{ device.crop_type | title }}</span>
+                                    {# Dynamic Icon Mapping #}
+                                    {% set icons = {
+                                        'lettuce':'🥬',
+                                        'tomato':'🍅',
+                                        'corn':'🌽',
+                                        'arugula':'🥬',
+                                        'generic':'🌱'
+                                    } %}
+                                    <span class="plant-badge">
+                                        {{icons.get(device.crop_type, '🌱')}}{{device.crop_type | title}}
+                                    </span>
                                     <span class="device-time">{{ row.timestamp.split(' ')[1] }}</span>
                                 </div>
                                 <div class="metrics-grid">
@@ -211,7 +223,9 @@
                                 {% set rec = recomendations.get(row.sensor_id) %}
                                 {% if rec %}
                                 <div class="recommendation {{ rec.level }}">
-                                    <span class="rec-label">Advice for {{ device.crop_type | title }}</span>
+                                    <span class="rec-label">
+                                        ADVICE FOR {{ icons.get(device.crop_type, '🌱') }} {{ device.crop_type | upper }}
+                                    </span>
                                     {{ rec.message }}
                                 </div>
                                 {% endif %}
