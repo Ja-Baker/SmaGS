@@ -5,30 +5,34 @@ import os
 DB_PATH = "smags.db"
 
 def setup_database():
+    # Force a fresh start by removing the old file if it exists
+    if os.path.exists(DB_PATH):
+        try:
+            os.remove(DB_PATH)
+            print(f"Cleared existing {DB_PATH} for a fresh start.")
+        except PermissionError:
+            print(f"Error: Could not delete {DB_PATH}. Ensure the app isn't running.")
+            return
+
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
-    print("--- Initializing SmaGS Database ---")
+    print("--- Initializing Blank SmaGS Database ---")
 
-    # 1. Create/Update Devices Table
-    # Added 'temp_unit' to store 'F' or 'C' preference
+    # 1. Create Devices Table
+    # Stores global settings like plant type and display units[cite: 13, 14]
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS devices (
             sensor_id TEXT PRIMARY KEY,
             name TEXT NOT NULL,
             visible_metrics TEXT DEFAULT '["soil_moisture", "soil_temp", "air_humidity", "air_temp"]',
-            temp_unit TEXT DEFAULT 'F'
+            temp_unit TEXT DEFAULT 'F',
+            crop_type TEXT DEFAULT 'generic'
         )
     ''')
 
-    # Migration Check: If the table existed but doesn't have temp_unit, add it
-    cursor.execute("PRAGMA table_info(devices)")
-    columns = [column[1] for column in cursor.fetchall()]
-    if 'temp_unit' not in columns:
-        print("Migrating: Adding 'temp_unit' column to devices table...")
-        cursor.execute("ALTER TABLE devices ADD COLUMN temp_unit TEXT DEFAULT 'F'")
-
     # 2. Create Sessions Table
+    # Used to group data logs into specific timeframes or growing seasons
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS sessions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -39,6 +43,7 @@ def setup_database():
     ''')
 
     # 3. Create Sensor Data Table
+    # The main log for all incoming ESP32 transmissions
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS sensor_data (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -54,26 +59,13 @@ def setup_database():
         )
     ''')
 
-    # 4. PRE-REGISTER YOUR SENSORS
-    known_sensors = [
-        ('378:1C:3C:B8:EE:6C', 'Greenhouse Alpha'),
-        ('36C:C8:40:93:F7:04', 'Greenhouse Beta')
-    ]
-    
-    for sensor_id, name in known_sensors:
-        cursor.execute('''
-            INSERT OR IGNORE INTO devices (sensor_id, name) 
-            VALUES (?, ?)
-        ''', (sensor_id, name))
-
-    # 5. Create an initial active session if none exists
-    cursor.execute("SELECT id FROM sessions WHERE status = 'active'")
-    if not cursor.fetchone():
-        cursor.execute("INSERT INTO sessions (status) VALUES ('active')")
+    # 4. Create an initial active session
+    # The system needs at least one active session to log data against[cite: 14]
+    cursor.execute("INSERT INTO sessions (status) VALUES ('active')")
 
     conn.commit()
     conn.close()
-    print("Success: Database schema (including Temp Units) is ready!")
+    print("Success: Blank database initialized with support for advisor_4 profiles.")
 
 if __name__ == "__main__":
     setup_database()

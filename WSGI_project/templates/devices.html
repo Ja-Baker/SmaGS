@@ -20,7 +20,7 @@
 
     <div class="container">
         <div class="info-box" style="background: var(--hover-bg); border: 1px solid var(--accent-primary); padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; color: var(--text-color);">
-            <strong>Local Preferences:</strong> Temperature units and display metrics are saved to <em>this browser</em>. Sensor names are saved to the database.
+            <strong>Local Preferences:</strong> Temperature units and display metrics are saved to <em>this browser</em>. Sensor names and assigned crops are saved to the database.
         </div>
 
         <div class="section">
@@ -40,7 +40,16 @@
                                 
                                 <label style="display: block; color: var(--accent-muted); font-size: 11px; margin-top: 15px; margin-bottom: 5px; letter-spacing: 1px;">FRIENDLY NAME (Global)</label>
                                 <input type="text" name="name" value="{{ dev.name }}" 
-                                       style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); color: var(--text-color); padding: 10px; border-radius: 6px;">
+                                       style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); color: var(--text-color); padding: 10px; border-radius: 6px; margin-bottom: 15px;">
+
+                                <label style="display: block; color: var(--accent-muted); font-size: 11px; margin-bottom: 5px; letter-spacing: 1px;">ASSIGNED CROP (Global)</label>
+                                <select name="crop_type" style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); color: var(--text-color); padding: 10px; border-radius: 6px;">
+                                    {% for crop in crop_list %}
+                                        <option value="{{ crop }}" {% if dev.crop_type == crop %}selected{% endif %}>
+                                            {{ crop.title() }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
                             </div>
 
                             <div class="setting-group">
@@ -82,7 +91,6 @@
     </div>
 
     <script>
-    // Load local cookie preferences
     window.onload = function() {
         const cookieValue = document.cookie.split('; ').find(row => row.startsWith('device_visibility='));
         if (cookieValue) {
@@ -98,7 +106,6 @@
                                 if (cb) cb.checked = true;
                             });
                         }
-                        // Load Temp Unit Radio
                         if(config.unit) {
                             const radio = card.querySelector(`input[name="temp_unit_local"][value="${config.unit}"]`);
                             if (radio) radio.checked = true;
@@ -109,7 +116,6 @@
         }
     };
 
-    // Save Metric + Unit preferences to Cookie
     function saveLocalConfig(sensorId) {
         const card = document.getElementById(`card-${sensorId}`);
         
@@ -128,7 +134,6 @@
             } catch(e) { configData = {}; }
         }
 
-        // Save both metrics and unit into the object for this sensor
         configData[sensorId] = {
             metrics: selectedMetrics,
             unit: selectedUnit

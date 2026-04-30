@@ -7,8 +7,6 @@
     --accent-secondary: #ff8c00;  
     --card-bg: #ffffff;
     --border-color: #101010;      
-    
-    /* Vibe colors */
     --exp-bar: #3ae716;         
 }
 
@@ -76,7 +74,6 @@ body {
     margin-bottom: 5px;
 }
 
-/* Define icons using high-quality fan sprites or emojis */
 .metric.moisture::before { content: '💧'; position: absolute; left: 0; font-size: 24px; }
 .metric.soiltemp::before { content: '🪨'; position: absolute; left: 0; font-size: 24px; } 
 .metric.humidity::before { content: '🌫️'; position: absolute; left: 0; font-size: 24px; } 
@@ -124,4 +121,105 @@ body {
     border: 2px solid var(--border-color);
     background: #fff;
     color: #000;
+}
+
+.weather-card {
+    background: var(--card-bg);
+    border: 4px solid var(--border-color);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 25px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    align-items: center;
+    box-shadow: 8px 8px 0px rgba(0,0,0,0.1);
+    position: relative;
+}
+
+.weather-now {
+    display: flex;
+    flex-direction: column;
+    min-width: 180px;
+    padding-left: 50px;
+    position: relative;
+}
+
+.weather-now::before {
+    content: '🌤️'; 
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 32px;
+}
+
+.weather-now .temp {
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--accent-secondary); 
+}
+
+.weather-now .label {
+    font-size: 8px;
+    text-transform: uppercase;
+    opacity: 0.8;
+}
+
+.weather-periods {
+    display: flex;
+    gap: 12px;
+    flex: 1;
+    flex-wrap: wrap;
+}
+
+.weather-period {
+    background: #f0f0f0;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    padding: 8px 12px;
+    min-width: 110px;
+    font-size: 8px;
+    text-align: center;
+}
+
+.weather-period .pname {
+    font-weight: bold;
+    color: var(--accent-primary);
+    margin-bottom: 5px;
+    border-bottom: 1px dashed #ccc;
+}
+
+.weather-period .ptemp {
+    color: var(--exp-bar); 
+    font-size: 10px;
+    display: block;
+}
+
+.recommendation {
+    margin-top: 15px;
+    padding: 12px;
+    border: 3px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 8px;
+    background: #fff;
+    line-height: 1.5;
+}
+
+.recommendation::before {
+    content: '💬';
+    margin-right: 8px;
+}
+
+.recommendation.ok       { border-color: var(--exp-bar); }
+.recommendation.info     { border-color: #64b5f6; }
+.recommendation.warn     { border-color: var(--accent-secondary); }
+.recommendation.critical { border-color: #e74c3c; }
+
+.recommendation .rec-label {
+    display: block;
+    font-size: 7px;
+    color: var(--accent-primary);
+    margin-bottom: 4px;
+    text-decoration: underline;
 }

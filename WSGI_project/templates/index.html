@@ -60,6 +60,19 @@
             cursor: pointer;
             font-weight: bold;
         }
+
+        /* Styling for the new Dynamic Plant Badge */
+        .plant-badge {
+            font-size: 0.7rem;
+            background: rgba(46, 204, 113, 0.2);
+            color: var(--accent-primary);
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-left: 10px;
+            border: 1px solid var(--accent-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
     </style>
 </head>
 <body>
@@ -109,6 +122,7 @@
     </div>
 
     <div class="container">
+        <!-- Weather Section -->
         <div class="section">
             <h2>Local Forecast</h2>
             {% if forecast and forecast.current %}
@@ -135,6 +149,7 @@
             {% endif %}
         </div>
 
+        <!-- Live Sensor Status Section -->
         <div class="section">
             <h2>Live Sensor Status</h2>
             <div class="card-grid">
@@ -142,11 +157,13 @@
                     {% set seen = namespace(sensors=[]) %}
                     {% for row in latest %}
                         {% if row.sensor_id not in seen.sensors %}
-                            {# Fetch device info including cookie-based visibility and units #}
-                            {% set device = device_map.get(row.sensor_id, {"name": row.sensor_id, "visible_metrics": all_metrics, "unit": "C"}) %}
+                            {# Pull device info from the map populated in app.py[cite: 10] #}
+                            {% set device = device_map.get(row.sensor_id, {"name": row.sensor_id, "visible_metrics": all_metrics, "unit": "C", "crop_type": "generic"}) %}
                             <div class="device-card">
                                 <div class="device-header">
                                     <span class="device-name">{{ device.name }}</span>
+                                    <!-- Dynamic Crop Badge[cite: 12] -->
+                                    <span class="plant-badge">🌱 {{ device.crop_type | title }}</span>
                                     <span class="device-time">{{ row.timestamp.split(' ')[1] }}</span>
                                 </div>
                                 <div class="metrics-grid">
@@ -190,10 +207,11 @@
                                     </div>
                                     {% endif %}
                                 </div>
+                                {# Recommendation pull based on the specific crop[cite: 10, 13] #}
                                 {% set rec = recomendations.get(row.sensor_id) %}
                                 {% if rec %}
                                 <div class="recommendation {{ rec.level }}">
-                                    <span class="rec-label">Recommendation</span>
+                                    <span class="rec-label">Advice for {{ device.crop_type | title }}</span>
                                     {{ rec.message }}
                                 </div>
                                 {% endif %}
@@ -209,13 +227,14 @@
             </div>
         </div>
 
+        <!-- Historical Log Table -->
         <div class="section">
             <h2>Recent Data Log</h2>
             <div class="table-container">
                 <table>
                     <thead>
                         <tr>
-                            <th>Location</th>
+                            <th>Location / Plant</th>
                             <th>Soil Moist.</th>
                             <th>Soil Temp</th>
                             <th>Air Humid.</th>
@@ -225,9 +244,12 @@
                     </thead>
                     <tbody>
                         {% for row in latest %}
-                        {% set device = device_map.get(row.sensor_id, {"name": row.sensor_id, "unit": "C"}) %}
+                        {% set device = device_map.get(row.sensor_id, {"name": row.sensor_id, "unit": "C", "crop_type": "generic"}) %}
                         <tr>
-                            <td><strong>{{ device.name }}</strong></td>
+                            <td>
+                                <strong>{{ device.name }}</strong><br>
+                                <small style="color: var(--accent-muted)">{{ device.crop_type | title }}</small>
+                            </td>
                             <td>{{ row.soil_moisture }}%</td>
                             <td>
                                 {% if device.unit == 'F' %}
@@ -252,27 +274,7 @@
             </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <div id="chartModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <div class="chart-controls">
-                <h3 id="modalSensorName">Sensor Analytics</h3>
-                <select id="timeRange" onchange="updateChartData()">
-                    <option value="1">Last Hour</option>
-                    <option value="6">Last 6 Hours</option>
-                    <option value="24" selected>Last 24 Hours</option>
-                    <option value="168">Last Week</option>
-                </select>
-                <div id="metricToggles">
-                    <label><input type="checkbox" class="metric-toggle" value="soil_moisture" checked> Soil Moisture</label>
-                    <label><input type="checkbox" class="metric-toggle" value="soil_temp" checked> Soil Temp</label>
-                </div>
-            </div>
-            <canvas id="historyChart"></canvas>
-        </div>
-    </div>
+</body>
 
     <script>
         function changeTheme(selectElement) {

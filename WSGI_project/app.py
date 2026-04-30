@@ -3,6 +3,7 @@ import json
 import sqlite3
 import pytz
 import urllib.parse
+import advisor
 from datetime import datetime
 from urllib.parse import parse_qs
 from jinja2 import Environment, FileSystemLoader
@@ -99,7 +100,7 @@ def handle_index(environ, start_response):
         LEFT JOIN devices d ON s.sensor_id = d.sensor_id
         ORDER BY s.timestamp DESC LIMIT 20
     """).fetchall()
-    devices_raw = conn.execute("SELECT sensor_id, name FROM devices").fetchall()
+    devices_raw = conn.execute("SELECT sensor_id, name, crop_type FROM devices").fetchall()
     conn.close()
     device_map = {}
     for d in devices_raw:
@@ -123,13 +124,14 @@ def handle_index(environ, start_response):
         if sid in seen_for_rec:
             continue
         seen_for_rec.add(sid)
+        current_crop = device_map.get(sid,{}).get('crop_type','generic')
         reading = {
             'soil_moisture': row['soil_moisture'],
             'soil_temp': row['soil_temp'],
             'air_temp': row['air_temp'],
             'air_humidity': row['air_humidity']
         }
-        recomendations[sid] = recommend(reading, forecast)
+        recomendations[sid] = recommend(reading, forecast, crop=current_crop)
 
     template = env.get_template("index.html")
     content = template.render(
@@ -169,8 +171,10 @@ def handle_devices(environ, start_response):
         device_list.append(d)
 
     template = env.get_template('devices.html')
+    crop_list = list(advisor.CROP_PROFILES.keys())
     content = template.render(
         devices=device_list, 
+        crop_list=crop_list,
         theme=theme, 
         consented=consented
     ).encode("utf-8")
@@ -301,11 +305,12 @@ def handle_update_device(environ, start_response):
             new_name = params.get('name', ['Unnamed Sensor'])[0]
             if sensor_id:
                 conn = get_db()
+                new_crop = params.get('crop_type',['generic'])[0]
                 conn.execute("""
                     UPDATE devices 
-                    SET name = ? 
+                    SET name = ?, crop_type = ?
                     WHERE sensor_id = ?
-                """, (new_name, sensor_id))
+                """, (new_name, new_crop, sensor_id))
                 conn.commit()
                 conn.close()
             start_response("303 See Other", [("Location", "/devices")])

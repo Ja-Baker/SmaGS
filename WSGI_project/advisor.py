@@ -1,4 +1,36 @@
 CROP_PROFILES = {
+    'generic':{
+        'soil_moisture_min': 60,
+        'soil_moisture_max': 85,
+        'air_temp_min': 7,
+        'air_temp_max': 24,
+        'soil_temp_min': 4,
+        'air_humidity_max': 70,
+    },
+    'lettuce': { 
+        'soil_moisture_min': 60,
+        'soil_moisture_max': 85,
+        'air_temp_min': 7,
+        'air_temp_max': 24,
+        'soil_temp_min': 4,
+        'air_humidity_max': 70,
+    },
+    'tomato': { 
+        'soil_moisture_min': 50,
+        'soil_moisture_max': 80,
+        'air_temp_min': 15,
+        'air_temp_max': 30,
+        'soil_temp_min': 16,
+        'air_humidity_max': 85,
+    },
+    'corn': {
+        'soil_moisture_min': 40,
+        'soil_moisture_max': 75,
+        'air_temp_min': 15,
+        'air_temp_max': 35,
+        'soil_temp_min': 10,
+        'air_humidity_max': 90,
+    },
     'arugula': {
         'soil_moisture_min': 45,
         'soil_moisture_max': 75,
@@ -7,24 +39,7 @@ CROP_PROFILES = {
         'soil_temp_min': 7,
         'air_humidity_max': 80,
     },
-    'tomato': {
-        'soil_moisture_min': 40,
-        'soil_moisture_max': 75,
-        'air_temp_min': 18,
-        'air_temp_max': 29,
-        'soil_temp_min': 16,
-        'air_humidity_max': 85,
-    },
-    'corn': {
-        'soil_moisture_min': 35,
-        'soil_moisture_max': 70,
-        'air_temp_min': 15,
-        'air_temp_max': 32,
-        'soil_temp_min': 10,
-        'air_humidity_max': 90,
-    },
 }
-
 LEVEL_RANK = {'ok': 0, 'info': 1, 'warn': 2, 'critical': 3}
 
 def _precip_window(periods):
