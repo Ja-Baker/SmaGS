@@ -7,6 +7,8 @@ from datetime import datetime
 from urllib.parse import parse_qs
 from jinja2 import Environment, FileSystemLoader
 from dotenv import load_dotenv
+from weather import get_forecast
+from advisor import recommend
 
 # --- CONFIGURATION ---
 load_dotenv()
@@ -115,6 +117,23 @@ def handle_index(environ, start_response):
             "visible_metrics": user_visible,
             "unit": user_unit
         }
+
+    forecast = get_forecast()
+    recomendations = {}
+    seen_for_rec = set()
+    for row in latest_data:
+        sid=row['sensor_id']
+        if sid in seen_for_rec:
+            continue
+        seen_for_rec.add(sid)
+        reading = {
+            'soil_moisture': row['soil_moisture'],
+            'soil_temp': row['soil_temp'],
+            'air_temp': row['air_temp'],
+            'air_humidity': row['air_humidity']
+        }
+        recomendations[sid] = recommend(reading, forecast)
+
     template = env.get_template("index.html")
     content = template.render(
         latest=latest_data, 
@@ -123,6 +142,8 @@ def handle_index(environ, start_response):
         themes=get_available_themes(),
         all_metrics=ALL_METRICS,
         consented=consented
+        forecast=forecast,
+        recomendations=recomendations
     ).encode("utf-8")
 
     start_response("200 OK", [("Content-Type", "text/html")])
