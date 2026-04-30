@@ -1,0 +1,72 @@
+:root {
+    --bg-color: #000000;
+    --text-color: #f5f5f7;
+    --accent-primary: #0a84ff;
+    --accent-secondary: #98989d;
+    --accent-muted: #86868b;
+    --border-color: rgba(255, 255, 255, 0.15);
+    --hover-bg: rgba(10, 132, 255, 0.15);
+    
+    --glass-bg: rgba(28, 28, 30, 0.8);
+    --glass-blur: blur(25px);
+    --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
+}
+
+body {
+    background: radial-gradient(circle at top, #1c1c1e 0%, #000000 100%);
+    background-attachment: fixed;
+    color: var(--text-color);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+.topbar {
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    padding: 12px 40px;
+}
+
+.device-card, .weather-card, .info-box, .table-container {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--border-color);
+    border-radius: 18px; 
+    box-shadow: var(--shadow);
+    padding: 24px;
+    margin-bottom: 20px;
+}
+
+.nav-link, .save-btn, .accept-btn {
+    background: var(--accent-primary);
+    color: white;
+    border-radius: 980px; 
+    padding: 8px 20px;
+    font-weight: 500;
+    text-decoration: none;
+    border: none;
+}
+
+th {
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--accent-muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    padding: 16px;
+}
+
+td {
+    padding: 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.delete-btn {
+    background: rgba(255, 69, 58, 0.2) !important; 
+    color: #ff453a !important;
+    border-radius: 8px !important;
+}
