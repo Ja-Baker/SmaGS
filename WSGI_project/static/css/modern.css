@@ -17,6 +17,7 @@ body {
     color: var(--text-color);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
+    margin: 0;
 }
 
 .topbar {
@@ -27,15 +28,50 @@ body {
     position: sticky;
     top: 0;
     z-index: 1000;
-    padding: 12px 40px;
+    padding: 15px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 70px;
+}
+
+.topbar-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+}
+
+.nav-menu {
+    display: flex;
+    gap: 10px;
+}
+
+.logo-area {
+    display: flex;
+    flex-direction: column;
 }
 
 .topbar h1 {
+    margin: 0;
     font-weight: 600;
     letter-spacing: -0.5px;
+    font-size: 1.5rem;
 }
 
-.device-card, .weather-card, .info-box {
+.subtitle {
+    font-size: 12px;
+    margin-top: 2px;
+    color: var(--accent-muted);
+}
+
+.container {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.device-card, .weather-card, .info-box, .table-container {
     background: var(--glass-bg);
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
@@ -60,21 +96,29 @@ body {
     text-decoration: none;
     transition: all 0.2s ease;
     border: none;
+    display: inline-flex;
+    align-items: center;
+    font-size: 14px;
 }
 
-.nav-link:hover, .save-btn:hover {
-    background: #0077ed;
-    box-shadow: 0 4px 15px rgba(0, 113, 227, 0.3);
+.theme-picker form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--accent-muted);
 }
 
-.table-container {
+#theme-select {
     background: var(--glass-bg);
-    border-radius: 18px;
-    overflow: hidden;
+    color: var(--text-color);
     border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 2px 8px;
 }
 
 table {
+    width: 100%;
     border-collapse: collapse;
 }
 
@@ -83,8 +127,8 @@ th {
     color: var(--accent-muted);
     font-size: 11px;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
     padding: 16px;
+    text-align: left;
 }
 
 td {
@@ -98,9 +142,6 @@ td {
     border: none !important;
     border-radius: 8px !important;
     font-weight: 600 !important;
-}
-
-.delete-btn:hover {
-    background: #ff3b30 !important;
-    color: white !important;
+    padding: 6px 12px;
+    cursor: pointer;
 }
