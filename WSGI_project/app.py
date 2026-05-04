@@ -8,7 +8,7 @@ from datetime import datetime
 from urllib.parse import parse_qs
 from jinja2 import Environment, FileSystemLoader
 from weather import get_forecast
-from advisor import recommend
+from llm_advisor import recommend
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, os.getenv("DB_PATH", "smags.db"))
