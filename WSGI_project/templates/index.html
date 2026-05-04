@@ -8,47 +8,10 @@
     
     <link rel="stylesheet" href="/static/css/{{ theme }}.css">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    
+
     <style>
         :root {
-            --accent-primary: #2ecc71; 
-        }
-
-        .error-popup {
-            position: fixed;
-            bottom: 25px;
-            right: 25px;
-            background: #d9534f;
-            color: white;
-            padding: 16px 24px;
-            border-radius: 8px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            z-index: 9999;
-            animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            border-left: 5px solid #a94442;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(120%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        .error-popup.fade-out {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.8s ease-out;
-        }
-
-        .popup-icon { font-size: 24px; }
-        .popup-text strong { display: block; font-size: 1.1em; margin-bottom: 2px; }
-
-        .theme-picker select:disabled {
-            opacity: 0.6;
-            cursor: wait;
+            --accent-primary: #2ecc71;
         }
 
         .accept-btn {
@@ -105,7 +68,7 @@
         
         <div class="topbar-right">
             <nav class="nav-menu">
-                <a href="/devices" class="nav-link">&#9881; Devices</a>
+                <a href="/devices" class="nav-link">&#9881; Preferences</a>
                 <a href="/sessions" class="nav-link">Past Sessions</a>
             </nav>
             
@@ -160,12 +123,10 @@
                     {% set seen = namespace(sensors=[]) %}
                     {% for row in latest %}
                         {% if row.sensor_id not in seen.sensors %}
-                            {# Pull device info from the map populated in app.py[cite: 10] #}
                             {% set device = device_map.get(row.sensor_id, {"name": row.sensor_id, "visible_metrics": all_metrics, "unit": "C", "crop_type": "generic"}) %}
                             <div class="device-card">
                                 <div class="device-header">
                                     <span class="device-name">{{ device.name }}</span>
-                                    {# Dynamic Icon Mapping #}
                                     {% set icons = {
                                         'lettuce':'🥬',
                                         'tomato':'🍅',
@@ -219,8 +180,7 @@
                                     </div>
                                     {% endif %}
                                 </div>
-                                {# Recommendation pull based on the specific crop[cite: 10, 13] #}
-                                {% set rec = recomendations.get(row.sensor_id) %}
+                                {% set rec = recommendations.get(row.sensor_id) %}
                                 {% if rec %}
                                 <div class="recommendation {{ rec.level }}">
                                     <span class="rec-label">
@@ -288,23 +248,10 @@
             </div>
         </div>
     </div>
-</body>
 
     <script>
-        function changeTheme(selectElement) {
-            window.stop(); 
-            selectElement.disabled = true;
-            const themeWatchdog = setTimeout(() => {
-                window.location.href = "/?recovered=true"; 
-            }, 5000); 
-            selectElement.form.submit();
-        }
-
         window.onload = () => {
             const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('recovered')) {
-                showErrorPopup("Connection Reset", "The dashboard recovered from a temporary server hang.");
-            }
             if (urlParams.has('theme_updated')) {
                 const select = document.getElementById('theme-select');
                 if (select) {
@@ -313,23 +260,6 @@
                 }
             }
         };
-
-        function showErrorPopup(title, message) {
-            const popup = document.createElement('div');
-            popup.className = 'error-popup';
-            popup.innerHTML = `
-                <div class="popup-icon">⚠️</div>
-                <div class="popup-text">
-                    <strong>${title}</strong>
-                    <span>${message}</span>
-                </div>
-            `;
-            document.body.appendChild(popup);
-            setTimeout(() => {
-                popup.classList.add('fade-out');
-                setTimeout(() => popup.remove(), 1000);
-            }, 5000);
-        }
     </script>
 </body>
 </html>
