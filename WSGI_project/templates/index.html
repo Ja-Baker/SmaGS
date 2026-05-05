@@ -8,6 +8,7 @@
     
     <link rel="stylesheet" href="/static/css/{{ theme }}.css">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         :root {
@@ -124,7 +125,7 @@
                     {% for row in latest %}
                         {% if row.sensor_id not in seen.sensors %}
                             {% set device = device_map.get(row.sensor_id, {"name": row.sensor_id, "visible_metrics": all_metrics, "unit": "C", "crop_type": "generic"}) %}
-                            <div class="device-card">
+                            <div class="device-card clickable" onclick="openGraph('{{ row.sensor_id }}', '{{ device.name }}')">
                                 <div class="device-header">
                                     <span class="device-name">{{ device.name }}</span>
                                     {% set icons = {
@@ -201,6 +202,16 @@
             </div>
         </div>
 
+        <div id="graph-modal" class="graph-modal" onclick="closeGraph(event)">
+            <div class="graph-modal-content" onclick="event.stopPropagation()">
+                <button class="graph-modal-close" onclick="closeGraph()">&times;</button>
+                <h3 id="graph-modal-title"></h3>
+                <div class="graph-modal-canvas-wrap">
+                    <canvas id="graph-modal-canvas"></canvas>
+                </div>
+            </div>
+        </div>
+
         <!-- Historical Log Table -->
         <div class="section">
             <h2>Recent Data Log</h2>
@@ -260,6 +271,64 @@
                 }
             }
         };
+
+        let activeChart = null;
+
+        async function openGraph(sensorId, sensorName) {
+            const modal = document.getElementById('graph-modal');
+            const title = document.getElementById('graph-modal-title');
+            const canvas = document.getElementById('graph-modal-canvas');
+
+            modal.classList.add('open');
+            title.textContent = sensorName + ' — Last 7 Days';
+
+            if (activeChart) {
+                activeChart.destroy();
+                activeChart = null;
+            }
+
+            try {
+                const res = await fetch('/api/history/' + encodeURIComponent(sensorId) + '?hours=168');
+                const data = await res.json();
+                const step = Math.max(1, Math.floor(data.length / 60));
+                const sampled = data.filter((_, i) => i % step === 0);
+                const labels = sampled.map(d => d.timestamp.split(' ')[1]);
+
+                activeChart = new Chart(canvas.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            { label: 'Soil Moisture (%)', data: sampled.map(d => d.soil_moisture), borderColor: '#62b7f7', tension: 0.3, fill: false },
+                            { label: 'Soil Temp (°C)',   data: sampled.map(d => d.soil_temp),     borderColor: '#fe8660', tension: 0.3, fill: false },
+                            { label: 'Air Humidity (%)', data: sampled.map(d => d.air_humidity),  borderColor: '#5dbdb4', tension: 0.3, fill: false },
+                            { label: 'Air Temp (°C)',    data: sampled.map(d => d.air_temp),      borderColor: '#46d583', tension: 0.3, fill: false }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: { mode: 'index', intersect: false },
+                        plugins: { legend: { labels: { color: '#ccc' } } },
+                        scales: {
+                            x: { ticks: { color: '#aaa', maxTicksLimit: 8 } },
+                            y: { ticks: { color: '#aaa' } }
+                        }
+                    }
+                });
+            } catch (e) {
+                title.textContent = sensorName + ' — failed to load history';
+            }
+        }
+
+        function closeGraph(event) {
+            if (event && event.target.id !== 'graph-modal' && event.type !== 'click') return;
+            document.getElementById('graph-modal').classList.remove('open');
+            if (activeChart) {
+                activeChart.destroy();
+                activeChart = null;
+            }
+        }
     </script>
 </body>
 </html>
